@@ -1,4 +1,4 @@
-package com.callee.calleeclient.libs;
+package com.callee.calleeclient;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -6,7 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.callee.calleeclient.Client.SingleChat;
-import com.callee.calleeclient.UserInfoActivityFragment;
+import com.callee.calleeclient.fragments.ChatFragment;
+import com.callee.calleeclient.fragments.UserInfoActivityFragment;
 
 import java.util.ArrayList;
 

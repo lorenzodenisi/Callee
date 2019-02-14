@@ -1,14 +1,10 @@
 package com.callee.calleeclient;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -19,7 +15,7 @@ import java.util.ArrayList;
 public class HomeActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
-    private com.callee.calleeclient.libs.PagerAdapter mAdapter;
+    private PagerAdapter mAdapter;
 
     private ArrayList<SingleChat> chats;
 
@@ -34,7 +30,7 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mViewPager = (ViewPager) findViewById(R.id.mainPager);
-        mAdapter=new com.callee.calleeclient.libs.PagerAdapter(this.getSupportFragmentManager(), this.chats);
+        mAdapter=new PagerAdapter(this.getSupportFragmentManager(), this.chats);
         mViewPager.setAdapter(mAdapter);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
