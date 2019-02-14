@@ -1,4 +1,4 @@
-package com.callee.calleeclient.Client;
+package com.callee.calleeclient.client;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,6 +8,7 @@ public class SingleChat implements Parcelable {
     private int newMessages;
     private String lastMessagePreview;
     private String lastMessageHour;
+    private String email;
 
     public SingleChat(String name){
         this.user=name;
@@ -15,8 +16,9 @@ public class SingleChat implements Parcelable {
         this.lastMessagePreview="";
     }
 
-    public SingleChat(String name, String lastMessagePreview, int newMessages, String lastMessageHour){
+    public SingleChat(String name,String email, String lastMessagePreview, int newMessages, String lastMessageHour){
         this.user=name;
+        this.email=email;
         this.lastMessagePreview=lastMessagePreview;
         this.newMessages=newMessages;
         this.lastMessageHour=lastMessageHour;
@@ -54,6 +56,14 @@ public class SingleChat implements Parcelable {
         this.lastMessageHour = lastMessageHour;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public String toString(){
         return this.user;
@@ -62,13 +72,14 @@ public class SingleChat implements Parcelable {
 
     //code for make SingleChat parselable
     public SingleChat(Parcel p){
-        String[] data = new String[3];
+        String[] data = new String[5];
 
         p.readStringArray(data);
         this.user = data[0];
-        newMessages = Integer.parseInt(data[1]);
-        this.lastMessagePreview = data[2];
-        this.lastMessageHour=data[3];
+        this.email = data[1];
+        newMessages = Integer.parseInt(data[2]);
+        this.lastMessagePreview = data[3];
+        this.lastMessageHour=data[4];
     }
 
     @Override
@@ -78,7 +89,7 @@ public class SingleChat implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[] {this.user,
+        dest.writeStringArray(new String[] {this.user, this.email,
                 String.valueOf(this.newMessages),
                 this.lastMessagePreview, this.lastMessageHour});
     }

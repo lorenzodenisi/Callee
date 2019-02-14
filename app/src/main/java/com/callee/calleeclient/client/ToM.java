@@ -1,4 +1,4 @@
-package com.callee.calleeclient.Client;
+package com.callee.calleeclient.client;
 
 public enum ToM {
 

@@ -8,14 +8,7 @@ import android.view.ViewGroup;
 
 import com.callee.calleeclient.R;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class UserInfoActivityFragment extends Fragment {
-
-    public UserInfoActivityFragment() {
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

@@ -1,4 +1,4 @@
-package com.callee.calleeclient.Client;
+package com.callee.calleeclient.client;
 
 import org.json.JSONArray;
 import org.json.JSONException;

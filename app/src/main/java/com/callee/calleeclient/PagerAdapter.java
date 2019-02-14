@@ -1,12 +1,13 @@
 package com.callee.calleeclient;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.callee.calleeclient.Client.SingleChat;
-import com.callee.calleeclient.fragments.ChatFragment;
+import com.callee.calleeclient.client.SingleChat;
+import com.callee.calleeclient.fragments.ChatListFragment;
 import com.callee.calleeclient.fragments.UserInfoActivityFragment;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
             case 2:     //TODO list of users
             case 1: {
                 Bundle b=new Bundle();
-                ChatFragment cF= new ChatFragment();
+                ChatListFragment cF= new ChatListFragment();
                 b.putParcelableArrayList("chats", chats);
                 cF.setArguments(b);
                 return cF;
@@ -39,7 +40,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;       //TODO remove hardcode
+        return Global.tabNumber;
     }
 
     @Override

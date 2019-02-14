@@ -1,5 +1,6 @@
 package com.callee.calleeclient;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -7,8 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import com.callee.calleeclient.Client.SingleChat;
+import com.callee.calleeclient.client.SingleChat;
 
 import java.util.ArrayList;
 
@@ -38,7 +40,8 @@ public class HomeActivity extends AppCompatActivity {
         mViewPager.setCurrentItem(1);     //default tab
 
         //TODO add custom width to tabs (maybe icons) extension needed
-    }
+
+       }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -65,19 +68,18 @@ public class HomeActivity extends AppCompatActivity {
     //TODO integrate with a sqlite db
     private void fetchInformations(){
         this.chats=new ArrayList<>();
-        chats.add(new SingleChat("Mario Rossi", "ciao come va?", 99, "00:00"));
-        chats.add(new SingleChat("Luca Bianchi", "vuoi due noci?", 32, "12:20"));
-        chats.add(new SingleChat("Alberto Neri", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
-        chats.add(new SingleChat("Maria Blu", "Buonanotte", 2, "23:12"));
-        chats.add(new SingleChat("Mario Rossi", "ciao come va?", 99, "00:00"));
-        chats.add(new SingleChat("Luca Bianchi", "vuoi due noci?", 32, "12:20"));
-        chats.add(new SingleChat("Alberto Neri", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
-        chats.add(new SingleChat("Maria Blu", "Buonanotte", 2, "23:12"));
-        chats.add(new SingleChat("Mario Rossi", "ciao come va?", 99, "00:00"));
-        chats.add(new SingleChat("Luca Bianchi", "vuoi due noci?", 32, "12:20"));
-        chats.add(new SingleChat("Alberto Neri", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
-        chats.add(new SingleChat("Maria Blu", "Buonanotte", 2, "23:12"));
-
+        chats.add(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, "00:00"));
+        chats.add(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, "12:20"));
+        chats.add(new SingleChat("Alberto Neri", "albertoneri@gmail.com", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
+        chats.add(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, "23:12"));
+        chats.add(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, "00:00"));
+        chats.add(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, "12:20"));
+        chats.add(new SingleChat("Alberto Neri", "albertoneri@gmail.com", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
+        chats.add(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, "23:12"));
+        chats.add(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, "00:00"));
+        chats.add(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, "12:20"));
+        chats.add(new SingleChat("Alberto Neri", "albertoneri@gmail.com", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
+        chats.add(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, "23:12"));
     }
 
 }
