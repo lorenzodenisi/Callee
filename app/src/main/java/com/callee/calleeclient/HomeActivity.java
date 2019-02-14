@@ -30,7 +30,6 @@ public class HomeActivity extends AppCompatActivity {
 
         fetchInformations();
 
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -70,10 +69,19 @@ public class HomeActivity extends AppCompatActivity {
     //TODO integrate with a sqlite db
     private void fetchInformations(){
         this.chats=new ArrayList<>();
-        chats.add(new SingleChat("Mario Rossi"));
-        chats.add(new SingleChat("Luca Bianchi"));
-        chats.add(new SingleChat("Alberto Neri"));
-        chats.add(new SingleChat("Maria Blu"));
+        chats.add(new SingleChat("Mario Rossi", "ciao come va?", 99, "00:00"));
+        chats.add(new SingleChat("Luca Bianchi", "vuoi due noci?", 32, "12:20"));
+        chats.add(new SingleChat("Alberto Neri", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
+        chats.add(new SingleChat("Maria Blu", "Buonanotte", 2, "23:12"));
+        chats.add(new SingleChat("Mario Rossi", "ciao come va?", 99, "00:00"));
+        chats.add(new SingleChat("Luca Bianchi", "vuoi due noci?", 32, "12:20"));
+        chats.add(new SingleChat("Alberto Neri", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
+        chats.add(new SingleChat("Maria Blu", "Buonanotte", 2, "23:12"));
+        chats.add(new SingleChat("Mario Rossi", "ciao come va?", 99, "00:00"));
+        chats.add(new SingleChat("Luca Bianchi", "vuoi due noci?", 32, "12:20"));
+        chats.add(new SingleChat("Alberto Neri", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
+        chats.add(new SingleChat("Maria Blu", "Buonanotte", 2, "23:12"));
+
     }
 
 }

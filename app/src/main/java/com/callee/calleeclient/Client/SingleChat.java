@@ -7,11 +7,19 @@ public class SingleChat implements Parcelable {
     private String user;
     private int newMessages;
     private String lastMessagePreview;
+    private String lastMessageHour;
 
     public SingleChat(String name){
         this.user=name;
         this.newMessages=0;
         this.lastMessagePreview="";
+    }
+
+    public SingleChat(String name, String lastMessagePreview, int newMessages, String lastMessageHour){
+        this.user=name;
+        this.lastMessagePreview=lastMessagePreview;
+        this.newMessages=newMessages;
+        this.lastMessageHour=lastMessageHour;
     }
 
     public String getUser() {
@@ -38,6 +46,14 @@ public class SingleChat implements Parcelable {
         this.lastMessagePreview = lastMessagePreview;
     }
 
+    public String getLastMessageHour() {
+        return lastMessageHour;
+    }
+
+    public void setLastMessageHour(String lastMessageHour) {
+        this.lastMessageHour = lastMessageHour;
+    }
+
     @Override
     public String toString(){
         return this.user;
@@ -52,6 +68,7 @@ public class SingleChat implements Parcelable {
         this.user = data[0];
         newMessages = Integer.parseInt(data[1]);
         this.lastMessagePreview = data[2];
+        this.lastMessageHour=data[3];
     }
 
     @Override
@@ -63,7 +80,7 @@ public class SingleChat implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[] {this.user,
                 String.valueOf(this.newMessages),
-                this.lastMessagePreview});
+                this.lastMessagePreview, this.lastMessageHour});
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

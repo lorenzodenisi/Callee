@@ -1,5 +1,9 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">60dp</dimen>
-    <dimen name="single_chat_preview">100dp</dimen>
+    <dimen name="single_chat_preview">80dp</dimen>
+    <dimen name="userNameFontSize">20sp</dimen>
+    <dimen name="messageCounterFontSize">15sp</dimen>
+    <dimen name="msgPreviewFontSize">14sp</dimen>
+    <dimen name="singleChatUniversalPadding">5dp</dimen>
 </resources>
