@@ -7,16 +7,63 @@
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/chat_toolbar"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <!--used just for back button-->
+            <android.support.v7.widget.Toolbar
+
+                android:id="@+id/chat_toolbar"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:padding="@dimen/singleChatUniversalPadding"
+                android:layout_gravity="center|start"
+                app:srcCompat="@mipmap/ic_app" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="8"
+                android:layout_gravity="start|center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/chat_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:paddingLeft="@dimen/singleChatUniversalPadding"
+                    android:paddingRight="@dimen/singleChatUniversalPadding"
+                    />
+
+                <TextView
+                    android:id="@+id/chat_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:paddingLeft="@dimen/singleChatUniversalPadding"
+                    android:paddingRight="@dimen/singleChatUniversalPadding"
+                    />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
 
     </android.support.design.widget.AppBarLayout>
 

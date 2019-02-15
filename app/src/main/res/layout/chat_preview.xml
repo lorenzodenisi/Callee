@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:padding="@dimen/singleChatUniversalPadding"
-        app:srcCompat="@mipmap/ic_launcher" />
+        app:srcCompat="@mipmap/ic_app" />
 
     <TableLayout
         android:layout_weight="4"
