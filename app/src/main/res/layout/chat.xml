@@ -67,7 +67,8 @@
 
     </android.support.design.widget.AppBarLayout>
 
-        <TextView
+        <FrameLayout
+            android:id="@+id/messagelist_container"
             android:text="CHAT"
             android:gravity="center"
             android:layout_height="0dp"

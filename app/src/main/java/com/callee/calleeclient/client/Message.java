@@ -1,9 +1,14 @@
 package com.callee.calleeclient.client;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Message {
+import java.util.Date;
+
+public class Message implements Parcelable{
 
     private JSONObject content = new JSONObject();
 
@@ -233,6 +238,11 @@ public class Message {
         }
     }
 
+    public String getDate(){
+        Date d = new Date(Long.parseLong(this.getTimestamp()));
+        return d.toString();
+    }
+
     static public ToM getType(String type) {
         switch (type) {
 
@@ -248,4 +258,48 @@ public class Message {
                 return null;
         }
     }
+
+
+
+    //code for make Message parselable
+    public Message(Parcel p){
+        String[] data = new String[7];
+
+        p.readStringArray(data);
+        this.setId(Long.parseLong(data[0]));
+        this.setFromName(data[1]);
+        this.setToName(data[2]);
+        this.setFromEmail(data[3]);
+        this.setToEmail(data[4]);
+        this.setTimestamp(Long.parseLong(data[5]));
+        this.setType(getType(data[6]));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringArray(new String[] {
+                this.getId().toString(),
+                this.getFromName(),
+                this.getToEmail(),
+                this.getFromName(),
+                this.getToName(),
+                this.getTimestamp(),
+                this.getType().toString()
+        });
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public SingleChat createFromParcel(Parcel in) {
+            return new SingleChat(in);
+        }
+
+        public SingleChat[] newArray(int size) {
+            return new SingleChat[size];
+        }
+    };
 }
