@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+   <!--
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="calleePrimary">#fe9c08</color>
+    -->
+    <color name="colorPrimaryDark">#FF6F00</color>
+    <color name="colorAccent">#fe9c08</color>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="defalutChatBackground">#948E8E</color>
+    <color name="usernameTextColor">@android:color/black</color>
+    <color name="userEmailTextColor">#646464</color>
+    <color name="messageTextColor">@android:color/black</color>
+    <color name="messageDateColor">#646464</color>
+    <color name="send_message_box_hint_color">#A0FE9C08</color>
+
 </resources>

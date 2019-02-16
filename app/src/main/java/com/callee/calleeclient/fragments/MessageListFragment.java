@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import com.callee.calleeclient.ChatSimpleAdapter;
 import com.callee.calleeclient.R;
 import com.callee.calleeclient.client.Message;
 
@@ -43,11 +44,15 @@ public class MessageListFragment extends ListFragment {
 
         String[] from = {"text", "date"};
         int[] to = {R.id.message_text, R.id.message_date};
-        SimpleAdapter sa = new SimpleAdapter(this.getContext(), data,R.layout.message, from, to);
+        ChatSimpleAdapter sa = new ChatSimpleAdapter(this.getContext(), data,R.layout.message, from, to, messages, userEmail);      //TODO reduce arguments
         setListAdapter(sa);
 
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
 
-        //TODO use custom simpleadapter instead (to change gravity of layouts)
+    @Override
+    public void onStart(){
+        super.onStart();
+        this.getListView().setDivider(null);
     }
 }
