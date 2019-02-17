@@ -98,7 +98,7 @@ public class ChatActivity extends AppCompatActivity {
         public void onClick(View v) {
             TextView tw = findViewById(R.id.message_box);
             String content = tw.getText().toString();
-            Pattern p = Pattern.compile(" *[^ ]+ *");        //check illegal strings
+            Pattern p = Pattern.compile(".*\\S.*");         //check illegal strings
 
             if(p.matcher(content).matches() && (!content.equals(""))){
 
@@ -124,7 +124,7 @@ public class ChatActivity extends AppCompatActivity {
     private class TextChecker implements TextWatcher{
 
         boolean isValid=false;
-        Pattern p = Pattern.compile(" *[^ ]+ *");
+        Pattern p = Pattern.compile(".*\\S.*");
         ImageView button;
 
         public TextChecker(ImageView button){
@@ -139,6 +139,7 @@ public class ChatActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
+            System.out.println();
             if(p.matcher(s).matches() && (!s.equals("")) && (!isValid)){
                 isValid=true;
                 button.setImageResource(R.drawable.ic_send_icon);
