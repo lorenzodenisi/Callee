@@ -3,23 +3,29 @@ package com.callee.calleeclient;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.client.ToM;
 import com.callee.calleeclient.fragments.MessageListFragment;
-import com.callee.calleeclient.fragments.UserInfoActivityFragment;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
+
+import static java.lang.System.currentTimeMillis;
 
 public class ChatActivity extends AppCompatActivity {
 
     SingleChat chatData;
     ArrayList<Message> messages;
+    MessageListFragment msgListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +55,17 @@ public class ChatActivity extends AppCompatActivity {
         b = new Bundle();
         b.putParcelableArrayList("messages", messages);
         b.putString("user_email", chatData.getEmail());     //send also email of other user
-        MessageListFragment msgListFragment = new MessageListFragment();
+        msgListFragment = new MessageListFragment();
         msgListFragment.setArguments(b);
-        fm.beginTransaction().add(R.id.messagelist_container, msgListFragment).commit();
+        fm.beginTransaction().add(R.id.messagelist_container, msgListFragment, "messageList").commit();
+
+
+        ImageView sendButton = findViewById(R.id.send_message_button);
+        sendButton.setOnClickListener(new sendButtonOnClickListener());
+
+        TextView tw = findViewById(R.id.message_box);
+        tw.addTextChangedListener(new TextChecker(sendButton));
+
     }
 
     private void fetchMessages(SingleChat sc){
@@ -66,8 +80,6 @@ public class ChatActivity extends AppCompatActivity {
                 Message m3 = new Message(3L,  "Lorenzo De Nisi", "Mario Rossi",
                         "lorenzodenisi@gmail.com","mariorossi@gmail.com", 1550246504878L, ToM.MESSAGE);
 
-
-
                 m1.putText("Ciao come va?");
                 m2.putText("Tutto bene tu??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????");
                 m3.putText("Rispondi!");
@@ -77,6 +89,68 @@ public class ChatActivity extends AppCompatActivity {
                 this.messages.add(m3);
             }
         }
+    }
 
+
+    private class sendButtonOnClickListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            TextView tw = findViewById(R.id.message_box);
+            String content = tw.getText().toString();
+            Pattern p = Pattern.compile(" *[^ ]+ *");        //check illegal strings
+
+            if(p.matcher(content).matches() && (!content.equals(""))){
+
+                Message toSend = new Message(-1L, Global.username, chatData.getUser(),
+                        Global.email, chatData.getEmail(), currentTimeMillis(), ToM.MESSAGE);
+
+                toSend.putText(content);
+                //update request
+                //send to remote db
+                //send to private db
+
+                //if update and remote ok
+                //set lastupdated at the last message(this one)
+
+                messages.add(toSend);
+                msgListFragment.addMessage(toSend);
+                tw.setText("");
+                msgListFragment.scrollDown();
+            }
+        }
+    }
+
+    private class TextChecker implements TextWatcher{
+
+        boolean isValid=false;
+        Pattern p = Pattern.compile(" *[^ ]+ *");
+        ImageView button;
+
+        public TextChecker(ImageView button){
+            super();
+            this.button=button;
+            button.setImageResource(R.drawable.ic_callee_send_img_invalid);
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if(p.matcher(s).matches() && (!s.equals("")) && (!isValid)){
+                isValid=true;
+                button.setImageResource(R.drawable.ic_send_icon);
+            }
+            else if(((!p.matcher(s).matches()) || (s.equals(""))) && (isValid)){
+                isValid=false;
+                button.setImageResource(R.drawable.ic_callee_send_img_invalid);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
     }
 }

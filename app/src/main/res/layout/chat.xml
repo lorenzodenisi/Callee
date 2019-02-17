@@ -81,7 +81,7 @@
             app:layout_constraintBottom_toTopOf="@+id/message_box_container"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/message_box_container"
             android:layout_width="match_parent"
             android:background="@color/colorPrimary"
@@ -91,11 +91,13 @@
             android:paddingBottom="@dimen/send_message_box_vertical_padding"
 
             android:elevation="3dp"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <EditText
                 android:id="@+id/message_box"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="6"
                 android:layout_height="match_parent"
                 android:background="@null"
                 android:gravity="center|start"
@@ -106,7 +108,16 @@
                 android:textSize="@dimen/send_message_box_text_size"
                 android:textColorHint="@color/send_message_box_hint_color"
                 android:textCursorDrawable="@drawable/textview_cursor"/>
-        </FrameLayout>
+
+            <ImageView
+                android:id="@+id/send_message_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/ic_send_icon"
+                >
+            </ImageView>
+        </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 

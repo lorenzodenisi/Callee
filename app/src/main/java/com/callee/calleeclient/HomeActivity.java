@@ -26,6 +26,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        fetchCredentials();
         fetchInformations();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -80,6 +81,11 @@ public class HomeActivity extends AppCompatActivity {
         chats.add(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, "12:20"));
         chats.add(new SingleChat("Alberto Neri", "albertoneri@gmail.com", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
         chats.add(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, "23:12"));
+    }
+
+    private void fetchCredentials(){
+        Global.username="lorenzo";
+        Global.email="lorenzodenisi.com";
     }
 
 }

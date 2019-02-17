@@ -2,15 +2,9 @@ package com.callee.calleeclient.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.text.Layout;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import com.callee.calleeclient.ChatSimpleAdapter;
 import com.callee.calleeclient.R;
@@ -24,6 +18,7 @@ public class MessageListFragment extends ListFragment {
     private ArrayList<HashMap<String, String>> data;
     private ArrayList<Message> messages;
     private String userEmail;
+    ChatSimpleAdapter sa;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -44,7 +39,7 @@ public class MessageListFragment extends ListFragment {
 
         String[] from = {"text", "date"};
         int[] to = {R.id.message_text, R.id.message_date};
-        ChatSimpleAdapter sa = new ChatSimpleAdapter(this.getContext(), data,R.layout.message, from, to, messages, userEmail);      //TODO reduce arguments
+        sa = new ChatSimpleAdapter(this.getContext(), data, R.layout.message, from, to, messages, userEmail);      //TODO reduce arguments
         setListAdapter(sa);
 
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -54,5 +49,21 @@ public class MessageListFragment extends ListFragment {
     public void onStart(){
         super.onStart();
         this.getListView().setDivider(null);
+    }
+
+    public void addMessage(Message m){
+
+        if( ! messages.contains(m)) messages.add(m);
+
+        HashMap<String, String> map=new HashMap<>();
+        map.put("text", m.getText());
+        map.put("date", m.getDate());
+
+        this.data.add(map);
+        sa.notifyDataSetChanged();
+    }
+
+    public void scrollDown(){
+        this.getListView().smoothScrollToPosition(messages.size()-1);
     }
 }
