@@ -7,7 +7,7 @@ public class SingleChat implements Parcelable {
     private String user;
     private int newMessages;
     private String lastMessagePreview;
-    private String lastMessageHour;
+    private Long lastMessageTime;
     private String email;
 
     public SingleChat(String name){
@@ -16,12 +16,12 @@ public class SingleChat implements Parcelable {
         this.lastMessagePreview="";
     }
 
-    public SingleChat(String name,String email, String lastMessagePreview, int newMessages, String lastMessageHour){
+    public SingleChat(String name,String email, String lastMessagePreview, int newMessages, Long lastMessageTime){
         this.user=name;
         this.email=email;
         this.lastMessagePreview=lastMessagePreview;
         this.newMessages=newMessages;
-        this.lastMessageHour=lastMessageHour;
+        this.lastMessageTime = lastMessageTime;
     }
 
     public String getUser() {
@@ -48,12 +48,16 @@ public class SingleChat implements Parcelable {
         this.lastMessagePreview = lastMessagePreview;
     }
 
-    public String getLastMessageHour() {
-        return lastMessageHour;
+    public Long getLastMessageTime() {
+        return lastMessageTime;
     }
 
-    public void setLastMessageHour(String lastMessageHour) {
-        this.lastMessageHour = lastMessageHour;
+    public String getFormattedLastMessageTime(){
+        return Message.getFormattedTime(lastMessageTime);
+    }
+
+    public void setLastMessageTime(Long lastMessageTime) {
+        this.lastMessageTime = lastMessageTime;
     }
 
     public String getEmail() {
@@ -79,7 +83,7 @@ public class SingleChat implements Parcelable {
         this.email = data[1];
         newMessages = Integer.parseInt(data[2]);
         this.lastMessagePreview = data[3];
-        this.lastMessageHour=data[4];
+        this.lastMessageTime =Long.parseLong(data[4]);
     }
 
     @Override
@@ -91,7 +95,7 @@ public class SingleChat implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[] {this.user, this.email,
                 String.valueOf(this.newMessages),
-                this.lastMessagePreview, this.lastMessageHour});
+                this.lastMessagePreview, this.lastMessageTime.toString()});
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

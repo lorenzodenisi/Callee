@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.client.ToM;
+import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.fragments.MessageListFragment;
 
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class ChatActivity extends AppCompatActivity {
         switch (sc.getUser()){
             case "Mario Rossi":
             {
-                Message m1 = new Message(1L, "Mario Rossi", "Lorenzo De Nisi",
+                /*Message m1 = new Message(1L, "Mario Rossi", "Lorenzo De Nisi",
                         "mariorossi@gmail.com", "lorenzodenisi@gmail.com", 1550246135870L, ToM.MESSAGE);
                 Message m2 = new Message(2L,  "Lorenzo De Nisi", "Mario Rossi",
                         "lorenzodenisi@gmail.com","mariorossi@gmail.com", 1550246504878L, ToM.MESSAGE);
@@ -84,9 +85,11 @@ public class ChatActivity extends AppCompatActivity {
                 m2.putText("Tutto bene tu??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????");
                 m3.putText("Rispondi!");
 
-                this.messages.add(m1);
-                this.messages.add(m2);
-                this.messages.add(m3);
+                Global.db.putMessage(m1);
+                Global.db.putMessage(m2);
+                Global.db.putMessage(m3);*/
+
+                messages = Global.db.getMessages(new Contact(chatData.getUser(), chatData.getEmail(), null));
             }
         }
     }

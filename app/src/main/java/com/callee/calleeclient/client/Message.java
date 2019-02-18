@@ -6,9 +6,11 @@ import android.os.Parcelable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
-public class Message implements Parcelable{
+public class Message implements Parcelable {
 
     private JSONObject content = new JSONObject();
 
@@ -26,27 +28,27 @@ public class Message implements Parcelable{
         }
     }
 
-    public Message(JSONObject source) throws JSONException{
+    public Message(JSONObject source) throws JSONException {
 
-            this((Long) source.getLong("id"), (String) source.get("fromName"), (String) source.get("toName"),
-                    (String) source.get("fromEmail"), (String) source.get("toEmail"),
-                    (Long) source.get("timestamp"), getType((String) source.get("type")));
+        this((Long) source.getLong("id"), (String) source.get("fromName"), (String) source.get("toName"),
+                (String) source.get("fromEmail"), (String) source.get("toEmail"),
+                (Long) source.get("timestamp"), getType((String) source.get("type")));
 
-            if (source.has("text")) {
-                this.content.put("text", source.getString("text"));
-            }
+        if (source.has("text")) {
+            this.content.put("text", source.getString("text"));
+        }
 
-            if (source.has("lastUpdate")) {
-                this.content.put("lastUpdate", source.getLong("lastUpdate"));
-            }
+        if (source.has("lastUpdate")) {
+            this.content.put("lastUpdate", source.getLong("lastUpdate"));
+        }
     }
 
     public void addContent(JSONObject data) {
         content = data;
     }
 
-    public void addLastUpdated(Long ts){
-        if(this.getType()==ToM.UPDATEREQUEST) {
+    public void addLastUpdated(Long ts) {
+        if (this.getType() == ToM.UPDATEREQUEST) {
             try {
                 this.content.put("lastUpdate", ts);
             } catch (JSONException e) {
@@ -83,62 +85,62 @@ public class Message implements Parcelable{
     }
 
     public Long getId() {
-        if(this.content.has("id")) {
+        if (this.content.has("id")) {
             try {
                 return (Long) this.content.get("id");
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
             }
-        }else return (long)-1;
+        } else return (long) -1;
     }
 
     public String getFromName() {
-        if(this.content.has("fromName")) {
+        if (this.content.has("fromName")) {
             try {
                 return (String) this.content.get("fromName");
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
             }
-        }else return "";
+        } else return "";
     }
 
     public String getToName() {
-        if(this.content.has("toName")) {
+        if (this.content.has("toName")) {
             try {
                 return (String) this.content.get("toName");
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
             }
-        }else return "";
+        } else return "";
     }
 
     public String getFromEmail() {
-        if(this.content.has("fromEmail")) {
+        if (this.content.has("fromEmail")) {
             try {
                 return (String) this.content.get("fromEmail");
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
             }
-        }else return "";
+        } else return "";
     }
 
     public String getToEmail() {
-        if(this.content.has("toEmail")) {
+        if (this.content.has("toEmail")) {
             try {
                 return (String) this.content.get("toEmail");
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
             }
-        }else return "";
+        } else return "";
     }
 
     public String getTimestamp() {
-        if(this.content.has("timestamp")) {
+        if (this.content.has("timestamp")) {
             try {
                 long ts = this.content.getLong("timestamp");
                 return Long.toString(ts);
@@ -146,36 +148,36 @@ public class Message implements Parcelable{
                 e.printStackTrace();
                 return null;
             }
-        }else return "";
+        } else return "";
     }
 
     public ToM getType() {
-        if(this.content.has("type")) {
+        if (this.content.has("type")) {
             try {
                 return (ToM) this.content.get("type");
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
             }
-        }else return null;
+        } else return null;
     }
 
-    public String getText(){
-        if(this.content.has("text")) {
+    public String getText() {
+        if (this.content.has("text")) {
             try {
                 return (String) this.content.get("text");
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
             }
-        }else return "";
+        } else return "";
     }
 
-    public Long getLastUpdate(){
-        if(this.getType()==ToM.UPDATEREQUEST && this.content.has("lastUpdate")){
-            try{
+    public Long getLastUpdate() {
+        if (this.getType() == ToM.UPDATEREQUEST && this.content.has("lastUpdate")) {
+            try {
                 return this.content.getLong("lastUpdate");
-            }catch (JSONException e){
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
@@ -238,9 +240,8 @@ public class Message implements Parcelable{
         }
     }
 
-    public String getDate(){
-        Date d = new Date(Long.parseLong(this.getTimestamp()));
-        return d.toString();
+    public String getDate() {
+        return Message.getFormattedTime(Long.valueOf(this.getTimestamp()));
     }
 
     static public ToM getType(String type) {
@@ -259,10 +260,15 @@ public class Message implements Parcelable{
         }
     }
 
+    static public String getFormattedTime(Long timestamp){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 
+        Date d = new Date(timestamp);
+        return format.format(d);
+    }
 
     //code for make Message parselable
-    public Message(Parcel p){
+    public Message(Parcel p) {
         String[] data = new String[7];
 
         p.readStringArray(data);
@@ -282,7 +288,7 @@ public class Message implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[] {
+        dest.writeStringArray(new String[]{
                 this.getId().toString(),
                 this.getFromName(),
                 this.getToEmail(),

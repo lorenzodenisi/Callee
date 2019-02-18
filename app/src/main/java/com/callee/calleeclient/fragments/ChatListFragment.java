@@ -1,9 +1,7 @@
 package com.callee.calleeclient.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +10,6 @@ import android.widget.AdapterView;
 import android.widget.SimpleAdapter;
 
 import com.callee.calleeclient.ChatActivity;
-import com.callee.calleeclient.HomeActivity;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.R;
 
@@ -39,7 +36,7 @@ public class ChatListFragment extends ListFragment {
             map.put("user", sc.getUser());
             map.put("newMessages", String.valueOf(sc.getNewMessages()));
             map.put("lastMessagePreview", sc.getLastMessagePreview());
-            map.put("lastMessageHour", sc.getLastMessageHour());
+            map.put("lastMessageHour", sc.getFormattedLastMessageTime());
 
             data.add(map);
         }

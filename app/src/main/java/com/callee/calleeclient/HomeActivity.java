@@ -11,8 +11,12 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.callee.calleeclient.client.SingleChat;
+import com.callee.calleeclient.database.Contact;
+import com.callee.calleeclient.database.dbDriver;
 
 import java.util.ArrayList;
+
+import static com.callee.calleeclient.Global.db;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -21,10 +25,16 @@ public class HomeActivity extends AppCompatActivity {
 
     private ArrayList<SingleChat> chats;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        db = new dbDriver(this);
+        db.openConnection();
+        //db.restoreDB();
+        //db.setCredentials("lorenzo", "lorenzodenisi@gmail.com", "+393338846260"); //TODO add welcome activity
 
         fetchCredentials();
         fetchInformations();
@@ -68,24 +78,20 @@ public class HomeActivity extends AppCompatActivity {
 
     //TODO integrate with a sqlite db
     private void fetchInformations(){
-        this.chats=new ArrayList<>();
-        chats.add(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, "00:00"));
-        chats.add(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, "12:20"));
-        chats.add(new SingleChat("Alberto Neri", "albertoneri@gmail.com", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
-        chats.add(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, "23:12"));
-        chats.add(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, "00:00"));
-        chats.add(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, "12:20"));
-        chats.add(new SingleChat("Alberto Neri", "albertoneri@gmail.com", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
-        chats.add(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, "23:12"));
-        chats.add(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, "00:00"));
-        chats.add(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, "12:20"));
-        chats.add(new SingleChat("Alberto Neri", "albertoneri@gmail.com", "rispondi a Luca! le vuoi due noci?", 1, "12:23"));
-        chats.add(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, "23:12"));
+       /* db.putChat(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, (System.currentTimeMillis() - 1000000L)));
+        db.putChat(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, (System.currentTimeMillis() - 500000L)));
+        db.putChat(new SingleChat("Alberto Neri", "albertoneri@gmail.com", "rispondi a Luca! le vuoi due noci?", 1, (System.currentTimeMillis() - 10000L)));
+        db.putChat(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, (System.currentTimeMillis() - 5000L)));
+*/
+        this.chats=db.getChats();
     }
 
     private void fetchCredentials(){
-        Global.username="lorenzo";
-        Global.email="lorenzodenisi.com";
+
+        Contact c = db.getCredentials();
+
+        Global.username=c.getName();
+        Global.email=c.getEmail();
     }
 
 }
