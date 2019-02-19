@@ -37,11 +37,10 @@ public class Query {
                     ")\n";
 
 
-    public static String SQL_DELETE_DB =
-            "DROP TABLE CHATS;\n" +
-                    "DROP TABLE MESSAGES;\n" +
-                    "DROP TABLE CONTACTS;\n" +
-                    "DROP TABLE CREDENTIALS;\n";
+    public static String SQL_DELETE_CHATS = "DROP TABLE CHATS";
+    public static String SQL_DELETE_MESSAGES = "DROP TABLE MESSAGES";
+    public static String SQL_DELETE_CONTACTS = "DROP TABLE CONTACTS";
+    public static String SQL_DELETE_CREDENTIALS = "DROP TABLE CREDENTIALS";
 
     //TODO add database tables info (names and column names)
 }

@@ -34,7 +34,11 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.chat);
 
         Bundle b = this.getIntent().getBundleExtra("data");
-        chatData=b.getParcelable("chat");
+        chatData = b.getParcelable("chat");
+
+        //start retrieving messages
+        messages = new ArrayList<>();
+        Global.db.getMessages(messages, new Contact(chatData.getUser(), chatData.getEmail(), null));
 
         //toolbar used just for back button
         Toolbar toolbar = findViewById(R.id.chat_toolbar);
@@ -48,10 +52,14 @@ public class ChatActivity extends AppCompatActivity {
         TextView email = findViewById(R.id.chat_email);
         email.setText(chatData.getEmail());
 
-        messages=new ArrayList<>();
-        fetchMessages(chatData);
+        //putMessages(chatData);
 
         FragmentManager fm = getSupportFragmentManager();
+
+        //wait retrieving thread for messages
+        if(! Global.db.joinDbThread()){
+            System.out.println("Error retrieving messages");
+        }
 
         b = new Bundle();
         b.putParcelableArrayList("messages", messages);
@@ -69,11 +77,8 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    private void fetchMessages(SingleChat sc){
+    private void putMessages(SingleChat sc) {
 
-        switch (sc.getUser()){
-            case "Mario Rossi":
-            {
                 /*Message m1 = new Message(1L, "Mario Rossi", "Lorenzo De Nisi",
                         "mariorossi@gmail.com", "lorenzodenisi@gmail.com", 1550246135870L, ToM.MESSAGE);
                 Message m2 = new Message(2L,  "Lorenzo De Nisi", "Mario Rossi",
@@ -88,14 +93,10 @@ public class ChatActivity extends AppCompatActivity {
                 Global.db.putMessage(m1);
                 Global.db.putMessage(m2);
                 Global.db.putMessage(m3);*/
-
-                messages = Global.db.getMessages(new Contact(chatData.getUser(), chatData.getEmail(), null));
-            }
-        }
     }
 
 
-    private class sendButtonOnClickListener implements View.OnClickListener{
+    private class sendButtonOnClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
@@ -103,7 +104,7 @@ public class ChatActivity extends AppCompatActivity {
             String content = tw.getText().toString();
             Pattern p = Pattern.compile(".*\\S.*");         //check illegal strings
 
-            if(p.matcher(content).matches() && (!content.equals(""))){
+            if (p.matcher(content).matches() && (!content.equals(""))) {
 
                 Message toSend = new Message(-1L, Global.username, chatData.getUser(),
                         Global.email, chatData.getEmail(), currentTimeMillis(), ToM.MESSAGE);
@@ -111,7 +112,15 @@ public class ChatActivity extends AppCompatActivity {
                 toSend.putText(content);
                 //update request
                 //send to remote db
-                //send to private db
+                //listen to reply from server
+                //send to private db message from server
+
+                Global.db.putMessage(toSend);
+
+                if (!Global.db.joinDbThread()) {
+                    System.out.println("Error saving message to local database");
+                    return;
+                }
 
                 //if update and remote ok
                 //set lastupdated at the last message(this one)
@@ -124,15 +133,15 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private class TextChecker implements TextWatcher{
+    private class TextChecker implements TextWatcher {
 
-        boolean isValid=false;
+        boolean isValid = false;
         Pattern p = Pattern.compile(".*\\S.*");
         ImageView button;
 
-        public TextChecker(ImageView button){
+        public TextChecker(ImageView button) {
             super();
-            this.button=button;
+            this.button = button;
             button.setImageResource(R.drawable.ic_callee_send_img_invalid);
         }
 
@@ -143,12 +152,11 @@ public class ChatActivity extends AppCompatActivity {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             System.out.println();
-            if(p.matcher(s).matches() && (!s.equals("")) && (!isValid)){
-                isValid=true;
+            if (p.matcher(s).matches() && (!s.equals("")) && (!isValid)) {
+                isValid = true;
                 button.setImageResource(R.drawable.ic_send_icon);
-            }
-            else if(((!p.matcher(s).matches()) || (s.equals(""))) && (isValid)){
-                isValid=false;
+            } else if (((!p.matcher(s).matches()) || (s.equals(""))) && (isValid)) {
+                isValid = false;
                 button.setImageResource(R.drawable.ic_callee_send_img_invalid);
             }
         }

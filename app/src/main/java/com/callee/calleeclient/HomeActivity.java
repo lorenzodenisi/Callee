@@ -1,6 +1,6 @@
 package com.callee.calleeclient;
 
-import android.content.Intent;
+import android.net.wifi.hotspot2.pps.Credential;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.database.Contact;
@@ -34,7 +33,7 @@ public class HomeActivity extends AppCompatActivity {
         db = new dbDriver(this);
         db.openConnection();
         //db.restoreDB();
-        //db.setCredentials("lorenzo", "lorenzodenisi@gmail.com", "+393338846260"); //TODO add welcome activity
+        //db.setCredentials("Lorenzo De Nisi", "lorenzodenisi@gmail.com", "+393338846260"); //TODO add welcome activity
 
         fetchCredentials();
         fetchInformations();
@@ -76,19 +75,32 @@ public class HomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        db.closeConnection();
+    }
+
     //TODO integrate with a sqlite db
     private void fetchInformations(){
-       /* db.putChat(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, (System.currentTimeMillis() - 1000000L)));
+        /*db.putChat(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, (System.currentTimeMillis() - 1000000L)));
         db.putChat(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, (System.currentTimeMillis() - 500000L)));
         db.putChat(new SingleChat("Alberto Neri", "albertoneri@gmail.com", "rispondi a Luca! le vuoi due noci?", 1, (System.currentTimeMillis() - 10000L)));
         db.putChat(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, (System.currentTimeMillis() - 5000L)));
 */
-        this.chats=db.getChats();
+        this.chats=new ArrayList<>();
+        db.getChats(chats);
+        db.joinDbThread();
     }
 
     private void fetchCredentials(){
 
-        Contact c = db.getCredentials();
+        Contact c =new Contact(null, null, null);
+        db.getCredentials(c);
+
+        if(!db.joinDbThread()){
+            return;
+        }
 
         Global.username=c.getName();
         Global.email=c.getEmail();

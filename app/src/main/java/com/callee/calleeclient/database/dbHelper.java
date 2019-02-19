@@ -2,6 +2,7 @@ package com.callee.calleeclient.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class dbHelper extends SQLiteOpenHelper {
@@ -24,7 +25,7 @@ public class dbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(Query.SQL_DELETE_DB);
+        db.execSQL(Query.SQL_DELETE_CHATS);
         onCreate(db);
     }
 
@@ -33,7 +34,15 @@ public class dbHelper extends SQLiteOpenHelper {
     }
 
     public void restoreDB(SQLiteDatabase db){
-        db.execSQL(Query.SQL_DELETE_DB);
+        try {
+            db.execSQL(Query.SQL_DELETE_CHATS);
+            db.execSQL(Query.SQL_DELETE_MESSAGES);
+            db.execSQL(Query.SQL_DELETE_CONTACTS);
+            db.execSQL(Query.SQL_DELETE_CREDENTIALS);
+        }catch (SQLiteException e){
+            e.printStackTrace();
+            System.err.println("Error resoring database");
+        }
         this.onCreate(db);
     }
 
