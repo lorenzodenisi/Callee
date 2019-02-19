@@ -42,7 +42,7 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mViewPager = (ViewPager) findViewById(R.id.mainPager);
-        mAdapter=new PagerAdapter(this.getSupportFragmentManager(), this.chats);
+        mAdapter = new PagerAdapter(this.getSupportFragmentManager(), this.chats);
         mViewPager.setAdapter(mAdapter);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
@@ -51,7 +51,7 @@ public class HomeActivity extends AppCompatActivity {
 
         //TODO add custom width to tabs (maybe icons) extension needed
 
-       }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -76,34 +76,34 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         db.closeConnection();
     }
 
     //TODO integrate with a sqlite db
-    private void fetchInformations(){
+    private void fetchInformations() {
         /*db.putChat(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, (System.currentTimeMillis() - 1000000L)));
         db.putChat(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, (System.currentTimeMillis() - 500000L)));
         db.putChat(new SingleChat("Alberto Neri", "albertoneri@gmail.com", "rispondi a Luca! le vuoi due noci?", 1, (System.currentTimeMillis() - 10000L)));
         db.putChat(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, (System.currentTimeMillis() - 5000L)));
 */
-        this.chats=new ArrayList<>();
+        this.chats = new ArrayList<>();
         db.getChats(chats);
         db.joinDbThread();
     }
 
-    private void fetchCredentials(){
+    private void fetchCredentials() {
 
-        Contact c =new Contact(null, null, null);
+        Contact c = new Contact(null, null, null);
         db.getCredentials(c);
 
-        if(!db.joinDbThread()){
+        if (!db.joinDbThread()) {
             return;
         }
 
-        Global.username=c.getName();
-        Global.email=c.getEmail();
+        Global.username = c.getName();
+        Global.email = c.getEmail();
     }
 
 }

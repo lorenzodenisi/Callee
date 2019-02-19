@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.callee.calleeclient.client.Message;
@@ -77,6 +78,11 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onStart(){
+        super.onStart();
+    }
+
     private void putMessages(SingleChat sc) {
 
                 /*Message m1 = new Message(1L, "Mario Rossi", "Lorenzo De Nisi",
@@ -102,7 +108,7 @@ public class ChatActivity extends AppCompatActivity {
         public void onClick(View v) {
             TextView tw = findViewById(R.id.message_box);
             String content = tw.getText().toString();
-            Pattern p = Pattern.compile(".*\\S.*");         //check illegal strings
+            Pattern p = Pattern.compile(".*\\S.*", Pattern.DOTALL);         //check illegal strings
 
             if (p.matcher(content).matches() && (!content.equals(""))) {
 
@@ -136,7 +142,7 @@ public class ChatActivity extends AppCompatActivity {
     private class TextChecker implements TextWatcher {
 
         boolean isValid = false;
-        Pattern p = Pattern.compile(".*\\S.*");
+        Pattern p = Pattern.compile(".*\\S.*", Pattern.DOTALL);
         ImageView button;
 
         public TextChecker(ImageView button) {

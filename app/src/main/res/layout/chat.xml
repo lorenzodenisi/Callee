@@ -86,7 +86,7 @@
             android:layout_width="match_parent"
             android:background="@color/colorPrimary"
             android:layout_gravity="bottom"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:paddingTop="@dimen/send_message_box_vertical_padding"
             android:paddingBottom="@dimen/send_message_box_vertical_padding"
 
@@ -98,13 +98,17 @@
                 android:id="@+id/message_box"
                 android:layout_width="0dp"
                 android:layout_weight="6"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/single_line_min_height"
+                android:singleLine="false"
+                android:inputType="textMultiLine"
+                android:maxLines="5"
+                android:imeOptions="flagNoExtractUi"
                 android:background="@null"
                 android:gravity="center|start"
                 android:hint="@string/messageHint"
-                android:inputType="textPersonName"
                 android:textColor="@color/messageTextColor"
-                android:layout_margin="5dp"
+                android:padding="5dp"
                 android:textSize="@dimen/send_message_box_text_size"
                 android:textColorHint="@color/send_message_box_hint_color"
                 android:textCursorDrawable="@drawable/textview_cursor"/>
@@ -113,8 +117,9 @@
                 android:id="@+id/send_message_button"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent"
+                android:layout_height="@dimen/single_line_min_height"
                 app:srcCompat="@drawable/ic_send_icon"
+                android:layout_gravity="bottom|end"
                 >
             </ImageView>
         </LinearLayout>
