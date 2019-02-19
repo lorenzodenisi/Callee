@@ -10,17 +10,17 @@ public class SingleChat implements Parcelable {
     private Long lastMessageTime;
     private String email;
 
-    public SingleChat(String name){
-        this.user=name;
-        this.newMessages=0;
-        this.lastMessagePreview="";
+    public SingleChat(String name) {
+        this.user = name;
+        this.newMessages = 0;
+        this.lastMessagePreview = "";
     }
 
-    public SingleChat(String name,String email, String lastMessagePreview, int newMessages, Long lastMessageTime){
-        this.user=name;
-        this.email=email;
-        this.lastMessagePreview=lastMessagePreview;
-        this.newMessages=newMessages;
+    public SingleChat(String name, String email, String lastMessagePreview, int newMessages, Long lastMessageTime) {
+        this.user = name;
+        this.email = email;
+        this.lastMessagePreview = lastMessagePreview;
+        this.newMessages = newMessages;
         this.lastMessageTime = lastMessageTime;
     }
 
@@ -52,7 +52,7 @@ public class SingleChat implements Parcelable {
         return lastMessageTime;
     }
 
-    public String getFormattedLastMessageTime(){
+    public String getFormattedLastMessageTime() {
         return Message.getFormattedTime(lastMessageTime);
     }
 
@@ -69,13 +69,12 @@ public class SingleChat implements Parcelable {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return this.user;
     }
 
-
     //code for make SingleChat parselable
-    public SingleChat(Parcel p){
+    public SingleChat(Parcel p) {
         String[] data = new String[5];
 
         p.readStringArray(data);
@@ -83,7 +82,7 @@ public class SingleChat implements Parcelable {
         this.email = data[1];
         newMessages = Integer.parseInt(data[2]);
         this.lastMessagePreview = data[3];
-        this.lastMessageTime =Long.parseLong(data[4]);
+        this.lastMessageTime = Long.parseLong(data[4]);
     }
 
     @Override
@@ -93,7 +92,7 @@ public class SingleChat implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[] {this.user, this.email,
+        dest.writeStringArray(new String[]{this.user, this.email,
                 String.valueOf(this.newMessages),
                 this.lastMessagePreview, this.lastMessageTime.toString()});
     }

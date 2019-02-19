@@ -25,8 +25,10 @@ public class MessageListFragment extends ListFragment {
     {
         Bundle bundle= getArguments();
 
-        messages=bundle.getParcelableArrayList("messages");
-        userEmail=bundle.getString("user_email");
+        if (bundle != null) {
+            messages=bundle.getParcelableArrayList("messages");
+            userEmail=bundle.getString("user_email");
+        }
 
         data=new ArrayList<>();
         for(Message m: messages){
@@ -39,7 +41,7 @@ public class MessageListFragment extends ListFragment {
 
         String[] from = {"text", "date"};
         int[] to = {R.id.message_text, R.id.message_date};
-        sa = new ChatSimpleAdapter(this.getContext(), data, R.layout.message, from, to, messages, userEmail);      //TODO reduce arguments
+        sa = new ChatSimpleAdapter(this.getContext(), data, R.layout.message, from, to, messages, userEmail);
         setListAdapter(sa);
 
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -48,7 +50,7 @@ public class MessageListFragment extends ListFragment {
     @Override
     public void onStart(){
         super.onStart();
-        this.getListView().setDivider(null);
+        this.getListView().setDivider(null);        //remove grey lines that divide messages
     }
 
     public void addMessage(Message m){

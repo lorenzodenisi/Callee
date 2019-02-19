@@ -1,7 +1,7 @@
 package com.callee.calleeclient.database;
+
 import android.content.ContentValues;
 import android.content.Context;
-
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -21,7 +21,6 @@ public class dbDriver {
     private boolean[] res = {true};
     private ExceptionHandler handler = new ExceptionHandler(res);
 
-
     public dbDriver(Context context) {
         this.context = context;
     }
@@ -33,7 +32,6 @@ public class dbDriver {
         this.dbWritable = dbHelper.getWritableDatabase();
         return dbWritable != null && dbReadable != null;
     }
-
 
     public void putMessage(Message m) {
         dbThread = new Thread(new putMessageRunnable(m));
@@ -67,23 +65,22 @@ public class dbDriver {
         }
     }
 
-
     public void getMessages(ArrayList<Message> messages, Contact c) {
 
-        res[0]=true;
-        dbThread=new Thread(new getMessagesRunnable(messages, c));
+        res[0] = true;
+        dbThread = new Thread(new getMessagesRunnable(messages, c));
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
     }
 
-    private class getMessagesRunnable implements Runnable{
+    private class getMessagesRunnable implements Runnable {
 
-        ArrayList[] messages=new ArrayList[1];
+        ArrayList[] messages = new ArrayList[1];
         Contact c;
 
-        public getMessagesRunnable(ArrayList<Message> messages, Contact c) {
+        getMessagesRunnable(ArrayList<Message> messages, Contact c) {
             this.messages[0] = messages;
-            this.c=c;
+            this.c = c;
         }
 
         @Override
@@ -115,16 +112,15 @@ public class dbDriver {
         }
     }
 
-
     public void setCredentials(String user, String email, String number) {
 
-        res[0]=true;
-        dbThread=new Thread(new setCredentialsRunnable(user, email, number));
+        res[0] = true;
+        dbThread = new Thread(new setCredentialsRunnable(user, email, number));
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
     }
 
-    private class setCredentialsRunnable implements Runnable{
+    private class setCredentialsRunnable implements Runnable {
 
         String user, email, number;
 
@@ -145,24 +141,23 @@ public class dbDriver {
 
             dbWritable.delete("CREDENTIALS", null, null);
 
-            if(dbWritable.insert("CREDENTIALS", null, cv) == -1){
+            if (dbWritable.insert("CREDENTIALS", null, cv) == -1) {
                 System.out.println("Error setting credentials");
                 throw new SQLiteException();
             }
         }
     }
 
-
     public void getCredentials(Contact credentials) {
-        res[0]=true;
-        dbThread=new Thread(new getCredentialsRunnable(credentials));
+        res[0] = true;
+        dbThread = new Thread(new getCredentialsRunnable(credentials));
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
     }
 
-    private class getCredentialsRunnable implements Runnable{
+    private class getCredentialsRunnable implements Runnable {
 
-        Contact[] credentials=new Contact[1];
+        Contact[] credentials = new Contact[1];
 
         getCredentialsRunnable(Contact credentials) {
             this.credentials[0] = credentials;
@@ -184,7 +179,6 @@ public class dbDriver {
             c.close();
         }
     }
-
 
     public void putContact(Contact c) {
         res[0] = true;
@@ -213,16 +207,15 @@ public class dbDriver {
         }
     }
 
-
     public void getContacts(ArrayList<Contact> contacts) {
-        res[0]=true;
+        res[0] = true;
         dbThread = new Thread(new getContactsRunnable(contacts));
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
     }
 
     private class getContactsRunnable implements Runnable {
-        ArrayList[] contacts=new ArrayList[1];
+        ArrayList[] contacts = new ArrayList[1];
 
         getContactsRunnable(ArrayList<Contact> contacts) {
             this.contacts[0] = contacts;
@@ -247,20 +240,19 @@ public class dbDriver {
         }
     }
 
-
     public void getChats(ArrayList<SingleChat> chats) {
-        res[0]=true;
-        dbThread=new Thread(new getChatsRunnable(chats));
+        res[0] = true;
+        dbThread = new Thread(new getChatsRunnable(chats));
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
     }
 
-    private class getChatsRunnable implements Runnable{
+    private class getChatsRunnable implements Runnable {
 
         ArrayList[] chats = new ArrayList[1];
 
-        getChatsRunnable(ArrayList<SingleChat> chats){
-            this.chats[0]=chats;
+        getChatsRunnable(ArrayList<SingleChat> chats) {
+            this.chats[0] = chats;
         }
 
         @Override
@@ -285,7 +277,6 @@ public class dbDriver {
             c.close();
         }
     }
-
 
     public void putChat(SingleChat sc) {
         res[0] = true;
@@ -316,7 +307,6 @@ public class dbDriver {
         }
     }
 
-
     public void restoreDB() {
         dbHelper.restoreDB(dbWritable);
     }
@@ -324,8 +314,6 @@ public class dbDriver {
     public void closeConnection() {
         this.dbHelper.close();
     }
-
-
 
     public boolean joinDbThread() {
         if (dbThread != null) {
@@ -338,7 +326,6 @@ public class dbDriver {
         }
         return false;
     }
-
 
     private class ExceptionHandler implements Thread.UncaughtExceptionHandler {
         boolean[] res;
@@ -353,6 +340,4 @@ public class dbDriver {
             res[0] = false;
         }
     }
-
 }
-

@@ -7,11 +7,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class dbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Callee.db";
+    static final int DATABASE_VERSION = 1;
+    static final String DATABASE_NAME = "Callee.db";
 
-
-    public dbHelper(Context context){
+    dbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -29,17 +28,18 @@ public class dbHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public void restoreDB(SQLiteDatabase db){
+    void restoreDB(SQLiteDatabase db) {
         try {
             db.execSQL(Query.SQL_DELETE_CHATS);
             db.execSQL(Query.SQL_DELETE_MESSAGES);
             db.execSQL(Query.SQL_DELETE_CONTACTS);
             db.execSQL(Query.SQL_DELETE_CREDENTIALS);
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             e.printStackTrace();
             System.err.println("Error resoring database");
         }

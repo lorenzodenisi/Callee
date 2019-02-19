@@ -260,7 +260,7 @@ public class Message implements Parcelable {
         }
     }
 
-    static public String getFormattedTime(Long timestamp){
+    static public String getFormattedTime(Long timestamp) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 
         Date d = new Date(timestamp);

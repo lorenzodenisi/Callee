@@ -1,6 +1,5 @@
 package com.callee.calleeclient;
 
-
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +8,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.callee.calleeclient.client.Message;
@@ -69,7 +67,6 @@ public class ChatActivity extends AppCompatActivity {
         msgListFragment.setArguments(b);
         fm.beginTransaction().add(R.id.messagelist_container, msgListFragment, "messageList").commit();
 
-
         ImageView sendButton = findViewById(R.id.send_message_button);
         sendButton.setOnClickListener(new sendButtonOnClickListener());
 
@@ -100,7 +97,6 @@ public class ChatActivity extends AppCompatActivity {
                 Global.db.putMessage(m2);
                 Global.db.putMessage(m3);*/
     }
-
 
     private class sendButtonOnClickListener implements View.OnClickListener {
 
@@ -145,7 +141,7 @@ public class ChatActivity extends AppCompatActivity {
         Pattern p = Pattern.compile(".*\\S.*", Pattern.DOTALL);
         ImageView button;
 
-        public TextChecker(ImageView button) {
+        TextChecker(ImageView button) {
             super();
             this.button = button;
             button.setImageResource(R.drawable.ic_callee_send_img_invalid);

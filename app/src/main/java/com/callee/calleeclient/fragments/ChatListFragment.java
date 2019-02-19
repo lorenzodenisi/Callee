@@ -27,11 +27,13 @@ public class ChatListFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         Bundle bundle= getArguments();
-        chats = bundle.getParcelableArrayList("chats");       //getting data from Bundle
+        if (bundle != null) {
+            chats = bundle.getParcelableArrayList("chats");       //getting data from Bundle
+        }
 
         data=new ArrayList<>();
-        for(SingleChat sc : chats){
 
+        for(SingleChat sc : chats){
             HashMap<String, String> map=new HashMap<>();
             map.put("user", sc.getUser());
             map.put("newMessages", String.valueOf(sc.getNewMessages()));
@@ -49,22 +51,16 @@ public class ChatListFragment extends ListFragment {
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-
     @Override
     public void onStart(){
         super.onStart();
-        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        getListView().setOnItemClickListener((av, v, pos, index) -> {
+            Intent intent = new Intent(getActivity(), ChatActivity.class);
+            Bundle b = new Bundle();
+            b.putParcelable("chat", chats.get((int)index));
+            intent.putExtra("data", b);
 
-            @Override
-            public void onItemClick(AdapterView<?> av, View v, int pos, long index) {
-                Intent intent = new Intent(getActivity(), ChatActivity.class);
-                Bundle b = new Bundle();
-                b.putParcelable("chat", chats.get((int)index));
-                intent.putExtra("data", b);
-
-                startActivity(intent);
-            }
+            startActivity(intent);
         });
     }
-
 }

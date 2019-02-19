@@ -1,22 +1,22 @@
 package com.callee.calleeclient.database;
 
-public class Query {
+class Query {
 
-    public static String SQL_CREATE_CREDENTIALS =
+    static String SQL_CREATE_CREDENTIALS =
             "  CREATE TABLE IF NOT EXISTS CREDENTIALS(\n" +
                     "  username TEXT NOT NULL UNIQUE ,\n" +
                     "  email TEXT PRIMARY KEY NOT NULL ,\n" +
                     "  number TEXT\n" +
                     ")\n";
 
-    public static String SQL_CREATE_CONTACTS =
+    static String SQL_CREATE_CONTACTS =
             "CREATE TABLE IF NOT EXISTS CONTACTS(\n" +
                     "  username TEXT NOT NULL ,\n" +
                     "  email TEXT PRIMARY KEY NOT NULL ,\n" +
                     "  number TEXT\n" +
                     "  )\n ";
 
-    public static String SQL_CREATE_MESSAGES =
+    static String SQL_CREATE_MESSAGES =
             "CREATE TABLE IF NOT EXISTS MESSAGES(\n" +
                     "  ID BIGINT UNSIGNED PRIMARY KEY NOT NULL ,\n" +
                     "  fromName TEXT NOT NULL REFERENCES CONTACTS(username) ON UPDATE CASCADE ON DELETE NO ACTION ,\n" +
@@ -27,7 +27,7 @@ public class Query {
                     "  text TEXT\n" +
                     ")\n";
 
-    public static String SQL_CREATE_CHATS =
+    static String SQL_CREATE_CHATS =
             "CREATE TABLE IF NOT EXISTS CHATS(\n" +
                     "  user TEXT NOT NULL REFERENCES CONTACTS(username) ON UPDATE CASCADE ON DELETE NO ACTION ,\n" +
                     "  email TEXT PRIMARY KEY NOT NULL REFERENCES CONTACTS(email) ON UPDATE CASCADE ON DELETE NO ACTION ,\n" +
@@ -37,10 +37,10 @@ public class Query {
                     ")\n";
 
 
-    public static String SQL_DELETE_CHATS = "DROP TABLE CHATS";
-    public static String SQL_DELETE_MESSAGES = "DROP TABLE MESSAGES";
-    public static String SQL_DELETE_CONTACTS = "DROP TABLE CONTACTS";
-    public static String SQL_DELETE_CREDENTIALS = "DROP TABLE CREDENTIALS";
+    static String SQL_DELETE_CHATS = "DROP TABLE CHATS";
+    static String SQL_DELETE_MESSAGES = "DROP TABLE MESSAGES";
+    static String SQL_DELETE_CONTACTS = "DROP TABLE CONTACTS";
+    static String SQL_DELETE_CREDENTIALS = "DROP TABLE CREDENTIALS";
 
     //TODO add database tables info (names and column names)
 }

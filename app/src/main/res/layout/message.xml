@@ -1,43 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="wrap_content"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    >
+    android:layout_height="wrap_content">
+
     <LinearLayout
         android:id="@+id/message_container"
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
         android:background="@drawable/bg_message"
-        android:padding="5dp"
         android:orientation="vertical"
-        android:layout_gravity="start">      <!--to change programmatically-->
+        android:padding="5dp">      <!--to change programmatically-->
         <!--margins are also added programmatically-->
 
         <TextView
             android:id="@+id/message_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="6"
             android:layout_gravity="start"
-            android:layout_marginEnd="30dp"
             android:layout_marginStart="0dp"
-            android:textSize="@dimen/message_text_font_size"
+            android:layout_marginEnd="30dp"
+            android:layout_weight="6"
             android:textColor="@color/messageTextColor"
-            />
+            android:textSize="@dimen/message_text_font_size" />
 
         <TextView
             android:id="@+id/message_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_weight="1"
-            android:textSize="@dimen/message_date_font_size"
             android:layout_marginStart="30dp"
-            android:layout_marginEnd="0dp"
             android:layout_marginTop="5dp"
-            android:textColor="@color/messageDateColor"/>
+            android:layout_marginEnd="0dp"
+            android:layout_weight="1"
+            android:textColor="@color/messageDateColor"
+            android:textSize="@dimen/message_date_font_size" />
 
     </LinearLayout>
 

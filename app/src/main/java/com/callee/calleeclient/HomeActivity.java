@@ -1,6 +1,5 @@
 package com.callee.calleeclient;
 
-import android.net.wifi.hotspot2.pps.Credential;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -14,6 +13,7 @@ import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.database.dbDriver;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.callee.calleeclient.Global.db;
 
@@ -44,13 +44,12 @@ public class HomeActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.mainPager);
         mAdapter = new PagerAdapter(this.getSupportFragmentManager(), this.chats);
         mViewPager.setAdapter(mAdapter);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(mViewPager);
         mViewPager.setCurrentItem(1);     //default tab
 
         //TODO add custom width to tabs (maybe icons) extension needed
-
     }
 
     @Override
@@ -81,7 +80,6 @@ public class HomeActivity extends AppCompatActivity {
         db.closeConnection();
     }
 
-    //TODO integrate with a sqlite db
     private void fetchInformations() {
         /*db.putChat(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, (System.currentTimeMillis() - 1000000L)));
         db.putChat(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, (System.currentTimeMillis() - 500000L)));
@@ -105,5 +103,4 @@ public class HomeActivity extends AppCompatActivity {
         Global.username = c.getName();
         Global.email = c.getEmail();
     }
-
 }
