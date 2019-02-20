@@ -15,8 +15,6 @@ import com.callee.calleeclient.database.dbDriver;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static com.callee.calleeclient.Global.db;
-
 public class HomeActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
@@ -24,14 +22,13 @@ public class HomeActivity extends AppCompatActivity {
 
     private ArrayList<SingleChat> chats;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        db = new dbDriver(this);
-        db.openConnection();
+        Global.db = new dbDriver();
+        Global.db.openConnection(this);
         //db.restoreDB();
         //db.setCredentials("Lorenzo De Nisi", "lorenzodenisi@gmail.com", "+393338846260"); //TODO add welcome activity
 
@@ -77,7 +74,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        db.closeConnection();
+        Global.db.closeConnection();
     }
 
     private void fetchInformations() {
@@ -87,16 +84,16 @@ public class HomeActivity extends AppCompatActivity {
         db.putChat(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, (System.currentTimeMillis() - 5000L)));
 */
         this.chats = new ArrayList<>();
-        db.getChats(chats);
-        db.joinDbThread();
+        Global.db.getChats(chats);
+        Global.db.joinDbThread();
     }
 
     private void fetchCredentials() {
 
         Contact c = new Contact(null, null, null);
-        db.getCredentials(c);
+        Global.db.getCredentials(c);
 
-        if (!db.joinDbThread()) {
+        if (! Global.db.joinDbThread()) {
             return;
         }
 

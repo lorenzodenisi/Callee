@@ -17,6 +17,7 @@ import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.fragments.MessageListFragment;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static java.lang.System.currentTimeMillis;
@@ -33,6 +34,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.chat);
 
         Bundle b = this.getIntent().getBundleExtra("data");
+
         chatData = b.getParcelable("chat");
 
         //start retrieving messages
@@ -42,7 +44,7 @@ public class ChatActivity extends AppCompatActivity {
         //toolbar used just for back button
         Toolbar toolbar = findViewById(R.id.chat_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("");
 
         //fill user and email on appbar
@@ -56,7 +58,7 @@ public class ChatActivity extends AppCompatActivity {
         FragmentManager fm = getSupportFragmentManager();
 
         //wait retrieving thread for messages
-        if(! Global.db.joinDbThread()){
+        if(!  Global.db.joinDbThread()){
             System.out.println("Error retrieving messages");
         }
 
@@ -119,7 +121,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 Global.db.putMessage(toSend);
 
-                if (!Global.db.joinDbThread()) {
+                if (! Global.db.joinDbThread()) {
                     System.out.println("Error saving message to local database");
                     return;
                 }

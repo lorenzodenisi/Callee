@@ -15,7 +15,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     private ArrayList<SingleChat> chats;
 
-    public PagerAdapter(FragmentManager fm, ArrayList<SingleChat> chats){
+    PagerAdapter(FragmentManager fm, ArrayList<SingleChat> chats){
         super(fm);
         this.chats=chats;
     }

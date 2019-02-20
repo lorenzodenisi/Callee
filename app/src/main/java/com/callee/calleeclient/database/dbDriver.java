@@ -14,18 +14,16 @@ import java.util.ArrayList;
 
 public class dbDriver {
 
-    private Context context;
     private dbHelper dbHelper = null;
     private SQLiteDatabase dbReadable = null, dbWritable = null;
     private Thread dbThread;
     private boolean[] res = {true};
     private ExceptionHandler handler = new ExceptionHandler(res);
 
-    public dbDriver(Context context) {
-        this.context = context;
+    public dbDriver() {
     }
 
-    public boolean openConnection() {
+    public boolean openConnection(Context context) {
         this.dbHelper = new dbHelper(context);
 
         this.dbReadable = dbHelper.getReadableDatabase();
@@ -39,6 +37,7 @@ public class dbDriver {
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
     }
+
 
     private class putMessageRunnable implements Runnable {
         Message m;
@@ -340,4 +339,6 @@ public class dbDriver {
             res[0] = false;
         }
     }
+
+
 }
