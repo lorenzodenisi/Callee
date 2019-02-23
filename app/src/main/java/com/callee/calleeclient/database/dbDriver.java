@@ -11,6 +11,7 @@ import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.client.ToM;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class dbDriver {
 
@@ -38,7 +39,6 @@ public class dbDriver {
         dbThread.start();
     }
 
-
     private class putMessageRunnable implements Runnable {
         Message m;
 
@@ -64,7 +64,7 @@ public class dbDriver {
         }
     }
 
-    public void getMessages(ArrayList<Message> messages, Contact c) {
+    public void getMessages(List<Message> messages, Contact c) {
 
         res[0] = true;
         dbThread = new Thread(new getMessagesRunnable(messages, c));
@@ -74,10 +74,10 @@ public class dbDriver {
 
     private class getMessagesRunnable implements Runnable {
 
-        ArrayList[] messages = new ArrayList[1];
+        List[] messages = new ArrayList[1];
         Contact c;
 
-        getMessagesRunnable(ArrayList<Message> messages, Contact c) {
+        getMessagesRunnable(List<Message> messages, Contact c) {
             this.messages[0] = messages;
             this.c = c;
         }
@@ -306,6 +306,15 @@ public class dbDriver {
         }
     }
 
+    public long getLastUpdate(){
+        Cursor c = dbReadable.rawQuery("SELECT MAX(timestamp) FROM MESSAGES", null);
+        c.moveToNext();
+        long l= c.getLong(0);
+        c.close();
+
+        return l;
+    }
+
     public void restoreDB() {
         dbHelper.restoreDB(dbWritable);
     }
@@ -341,4 +350,5 @@ public class dbDriver {
     }
 
 
+    //TODO retrieve last Updated
 }

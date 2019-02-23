@@ -14,6 +14,9 @@ import java.util.ArrayList;
 public class PagerAdapter extends FragmentPagerAdapter {
 
     private ArrayList<SingleChat> chats;
+    private ChatListFragment cF;
+
+    private ArrayList<SingleChat> newChats;
 
     PagerAdapter(FragmentManager fm, ArrayList<SingleChat> chats){
         super(fm);
@@ -24,11 +27,11 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int i) {
 
         switch (i){
-            case 0: return new UserInfoActivityFragment();
             case 2:     //TODO list of users
+            case 0: return new UserInfoActivityFragment();
             case 1: {
                 Bundle b=new Bundle();
-                ChatListFragment cF= new ChatListFragment();
+                cF= new ChatListFragment();
                 b.putParcelableArrayList("chats", chats);
                 cF.setArguments(b);
                 return cF;
@@ -44,6 +47,24 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position){
-        return String.valueOf(position+1);      //TODO to remove once tabs can be custom
+        switch (position){
+            case 0: return"INFO";
+            case 1: return"CHAT";
+            case 2: return"CONTACTS";
+            default:return "";
+        }
+    }
+
+   public void updateData(ArrayList<SingleChat> newChats){
+        this.newChats=newChats;
+        this.notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemPosition(Object object){
+        if(object instanceof ChatListFragment){
+            ((ChatListFragment) object).updateData(newChats);
+        }
+        return super.getItemPosition(object);
     }
 }

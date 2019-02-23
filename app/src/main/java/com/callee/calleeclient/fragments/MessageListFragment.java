@@ -21,18 +21,17 @@ public class MessageListFragment extends ListFragment {
     ChatSimpleAdapter sa;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        Bundle bundle= getArguments();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Bundle bundle = getArguments();
 
         if (bundle != null) {
-            messages=bundle.getParcelableArrayList("messages");
-            userEmail=bundle.getString("user_email");
+            messages = bundle.getParcelableArrayList("messages");
+            userEmail = bundle.getString("user_email");
         }
 
-        data=new ArrayList<>();
-        for(Message m: messages){
-            HashMap<String, String> map=new HashMap<>();
+        data = new ArrayList<>();
+        for (Message m : messages) {
+            HashMap<String, String> map = new HashMap<>();
             map.put("text", m.getText());
             map.put("date", m.getDate());
 
@@ -48,16 +47,14 @@ public class MessageListFragment extends ListFragment {
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         this.getListView().setDivider(null);        //remove grey lines that divide messages
     }
 
-    public void addMessage(Message m){
+    public void addMessage(Message m) {
 
-        if( ! messages.contains(m)) messages.add(m);
-
-        HashMap<String, String> map=new HashMap<>();
+        HashMap<String, String> map = new HashMap<>();
         map.put("text", m.getText());
         map.put("date", m.getDate());
 
@@ -65,7 +62,11 @@ public class MessageListFragment extends ListFragment {
         sa.notifyDataSetChanged();
     }
 
-    public void scrollDown(){
-        this.getListView().smoothScrollToPosition(messages.size()-1);
+    public void scrollDown() {
+        this.getListView().smoothScrollToPosition(messages.size() - 1);
+    }
+
+    public void goDown(){
+        this.getListView().setSelection(messages.size()-1);
     }
 }

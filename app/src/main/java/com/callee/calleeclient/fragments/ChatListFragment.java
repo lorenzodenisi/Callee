@@ -3,6 +3,7 @@ package com.callee.calleeclient.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.text.style.UpdateAppearance;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,7 @@ public class ChatListFragment extends ListFragment {
             data.add(map);
         }
 
+
         String[] from={"user", "newMessages", "lastMessagePreview", "lastMessageHour"};
         int[] to={R.id.userNameTextBoxPreview, R.id.messageCounter, R.id.lastMessagePreview, R.id.lastMessageTime};
         adapter=new SimpleAdapter(getActivity(), data, R.layout.chat_preview, from, to);
@@ -62,5 +64,19 @@ public class ChatListFragment extends ListFragment {
 
             startActivity(intent);
         });
+    }
+
+    public void updateData(ArrayList<SingleChat> newChats){
+        chats.addAll(newChats);
+
+        for(SingleChat sc: newChats){
+            HashMap<String, String> map=new HashMap<>();
+            map.put("user", sc.getUser());
+            map.put("newMessages", String.valueOf(sc.getNewMessages()));
+            map.put("lastMessagePreview", sc.getLastMessagePreview());
+            map.put("lastMessageHour", sc.getFormattedLastMessageTime());
+            data.add(map);
+        }
+        adapter.notifyDataSetChanged();
     }
 }

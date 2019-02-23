@@ -1,5 +1,9 @@
 package com.callee.calleeclient;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -7,7 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.database.dbDriver;
@@ -19,6 +25,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
     private PagerAdapter mAdapter;
+    private UpdateThread updateService;
+    private HomeBReceiver broadcastReceiver;
 
     private ArrayList<SingleChat> chats;
 
@@ -29,11 +37,15 @@ public class HomeActivity extends AppCompatActivity {
 
         Global.db = new dbDriver();
         Global.db.openConnection(this);
-        //db.restoreDB();
-        //db.setCredentials("Lorenzo De Nisi", "lorenzodenisi@gmail.com", "+393338846260"); //TODO add welcome activity
+        //Global.db.restoreDB();
+        Global.db.setCredentials("Lorenzo De Nisi", "denisilorenzo@gmail.com", "+393338846260"); //TODO add welcome activity
+        Global.db.joinDbThread();
 
         fetchCredentials();
         fetchInformations();
+
+        updateService=new UpdateThread(this, Global.db, 5000, Global.db.getLastUpdate());
+        updateService.start();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -45,6 +57,10 @@ public class HomeActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(mViewPager);
         mViewPager.setCurrentItem(1);     //default tab
+
+        //setting bradcast receiver
+        broadcastReceiver=new HomeBReceiver();
+        this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
 
         //TODO add custom width to tabs (maybe icons) extension needed
     }
@@ -73,16 +89,12 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
+        this.unregisterReceiver(broadcastReceiver);
         super.onDestroy();
         Global.db.closeConnection();
     }
 
     private void fetchInformations() {
-        /*db.putChat(new SingleChat("Mario Rossi", "mariorossi@gmail.com", "ciao come va?", 99, (System.currentTimeMillis() - 1000000L)));
-        db.putChat(new SingleChat("Luca Bianchi", "lucabianchi@gmail.com", "vuoi due noci?", 32, (System.currentTimeMillis() - 500000L)));
-        db.putChat(new SingleChat("Alberto Neri", "albertoneri@gmail.com", "rispondi a Luca! le vuoi due noci?", 1, (System.currentTimeMillis() - 10000L)));
-        db.putChat(new SingleChat("Maria Blu","mariablu@gmail.com" , "Buonanotte", 2, (System.currentTimeMillis() - 5000L)));
-*/
         this.chats = new ArrayList<>();
         Global.db.getChats(chats);
         Global.db.joinDbThread();
@@ -99,5 +111,22 @@ public class HomeActivity extends AppCompatActivity {
 
         Global.username = c.getName();
         Global.email = c.getEmail();
+    }
+
+    public class HomeBReceiver extends BroadcastReceiver{
+
+        public HomeBReceiver(){
+            super();
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent){
+            Toast.makeText(context,"New messages!", Toast.LENGTH_LONG).show();
+
+            ArrayList<Message> ms=intent.getParcelableArrayListExtra("messages");
+            ArrayList<SingleChat> newChats=intent.getParcelableArrayListExtra("chats");
+            if(! newChats.isEmpty())
+            mAdapter.updateData(newChats);
+        }
     }
 }

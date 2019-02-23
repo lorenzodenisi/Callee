@@ -269,7 +269,7 @@ public class Message implements Parcelable {
 
     //code for make Message parselable
     public Message(Parcel p) {
-        String[] data = new String[7];
+        String[] data = new String[8];
 
         p.readStringArray(data);
         this.setId(Long.parseLong(data[0]));
@@ -279,6 +279,7 @@ public class Message implements Parcelable {
         this.setToEmail(data[4]);
         this.setTimestamp(Long.parseLong(data[5]));
         this.setType(getType(data[6]));
+        this.putText(data[7]);
     }
 
     @Override
@@ -292,20 +293,21 @@ public class Message implements Parcelable {
                 this.getId().toString(),
                 this.getFromName(),
                 this.getToEmail(),
-                this.getFromName(),
+                this.getFromEmail(),
                 this.getToName(),
                 this.getTimestamp(),
-                this.getType().toString()
+                this.getType().toString(),
+                this.getText()
         });
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-        public SingleChat createFromParcel(Parcel in) {
-            return new SingleChat(in);
+        public Message createFromParcel(Parcel in) {
+            return new Message(in);
         }
 
-        public SingleChat[] newArray(int size) {
-            return new SingleChat[size];
+        public Message[] newArray(int size) {
+            return new Message[size];
         }
     };
 }

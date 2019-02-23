@@ -1,5 +1,9 @@
 package com.callee.calleeclient;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -9,11 +13,13 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.client.ToM;
 import com.callee.calleeclient.database.Contact;
+import com.callee.calleeclient.database.dbDriver;
 import com.callee.calleeclient.fragments.MessageListFragment;
 
 import java.util.ArrayList;
@@ -24,22 +30,28 @@ import static java.lang.System.currentTimeMillis;
 
 public class ChatActivity extends AppCompatActivity {
 
-    SingleChat chatData;
-    ArrayList<Message> messages;
-    MessageListFragment msgListFragment;
+    private SingleChat chatData;
+    private final ArrayList<Message> messages = new ArrayList<>();       //synchronized
+    private MessageListFragment msgListFragment;
+    private ChatBReceiver broadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat);
 
+        //open database
+        Global.db = new dbDriver();
+        Global.db.openConnection(this);
+
         Bundle b = this.getIntent().getBundleExtra("data");
 
         chatData = b.getParcelable("chat");
 
         //start retrieving messages
-        messages = new ArrayList<>();
-        Global.db.getMessages(messages, new Contact(chatData.getUser(), chatData.getEmail(), null));
+        if (chatData != null) {
+            Global.db.getMessages(messages, new Contact(chatData.getUser(), chatData.getEmail(), null));
+        }
 
         //toolbar used just for back button
         Toolbar toolbar = findViewById(R.id.chat_toolbar);
@@ -53,12 +65,10 @@ public class ChatActivity extends AppCompatActivity {
         TextView email = findViewById(R.id.chat_email);
         email.setText(chatData.getEmail());
 
-        //putMessages(chatData);
-
         FragmentManager fm = getSupportFragmentManager();
 
         //wait retrieving thread for messages
-        if(!  Global.db.joinDbThread()){
+        if (!Global.db.joinDbThread()) {
             System.out.println("Error retrieving messages");
         }
 
@@ -75,29 +85,22 @@ public class ChatActivity extends AppCompatActivity {
         TextView tw = findViewById(R.id.message_box);
         tw.addTextChangedListener(new TextChecker(sendButton));
 
+        //setting bradcast receiver
+        broadcastReceiver = new ChatBReceiver();
+        this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
+        msgListFragment.goDown();
     }
 
-    private void putMessages(SingleChat sc) {
-
-                /*Message m1 = new Message(1L, "Mario Rossi", "Lorenzo De Nisi",
-                        "mariorossi@gmail.com", "lorenzodenisi@gmail.com", 1550246135870L, ToM.MESSAGE);
-                Message m2 = new Message(2L,  "Lorenzo De Nisi", "Mario Rossi",
-                        "lorenzodenisi@gmail.com","mariorossi@gmail.com", 1550246504878L, ToM.MESSAGE);
-                Message m3 = new Message(3L,  "Lorenzo De Nisi", "Mario Rossi",
-                        "lorenzodenisi@gmail.com","mariorossi@gmail.com", 1550246504878L, ToM.MESSAGE);
-
-                m1.putText("Ciao come va?");
-                m2.putText("Tutto bene tu??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????");
-                m3.putText("Rispondi!");
-
-                Global.db.putMessage(m1);
-                Global.db.putMessage(m2);
-                Global.db.putMessage(m3);*/
+    @Override
+    public void onDestroy() {
+        this.unregisterReceiver(broadcastReceiver);
+        Global.db.closeConnection();
+        super.onDestroy();
     }
 
     private class sendButtonOnClickListener implements View.OnClickListener {
@@ -114,24 +117,15 @@ public class ChatActivity extends AppCompatActivity {
                         Global.email, chatData.getEmail(), currentTimeMillis(), ToM.MESSAGE);
 
                 toSend.putText(content);
-                //update request
-                //send to remote db
-                //listen to reply from server
-                //send to private db message from server
-
-                Global.db.putMessage(toSend);
-
-                if (! Global.db.joinDbThread()) {
-                    System.out.println("Error saving message to local database");
-                    return;
-                }
-
-                //if update and remote ok
-                //set lastupdated at the last message(this one)
 
                 messages.add(toSend);
-                msgListFragment.addMessage(toSend);
+
+                SendMessageThread sendThread = new SendMessageThread(Global.db, toSend, messages);
+                sendThread.start();
+
                 tw.setText("");
+
+                msgListFragment.addMessage(toSend);
                 msgListFragment.scrollDown();
             }
         }
@@ -167,6 +161,39 @@ public class ChatActivity extends AppCompatActivity {
 
         @Override
         public void afterTextChanged(Editable s) {
+        }
+    }
+
+    public class ChatBReceiver extends BroadcastReceiver {
+
+        public ChatBReceiver() {
+            super();
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //Toast.makeText(context, "New messages!", Toast.LENGTH_LONG).show();
+            long lastReceived = Long.parseLong(messages.get(messages.size() - 1).getTimestamp());
+
+            ArrayList<Message> newMessages = intent.getParcelableArrayListExtra("messages");
+
+            for (Message m : newMessages) {
+                if (m.getToEmail().equals(chatData.getEmail())
+                        || m.getFromEmail().equals(chatData.getEmail())) {
+
+                    //adding message if is new
+                    //I could get duplicate messages when message is sent and then received due to update
+
+                    if (Long.valueOf(m.getTimestamp()) > lastReceived) {
+
+                        synchronized (messages) {
+                            messages.add(m);
+                            msgListFragment.addMessage(m);
+                            msgListFragment.scrollDown();
+                        }
+                    }
+                }
+            }
         }
     }
 }
