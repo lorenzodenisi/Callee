@@ -1,4 +1,4 @@
-package com.callee.calleeclient;
+package com.callee.calleeclient.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,10 +13,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.callee.calleeclient.Global;
+import com.callee.calleeclient.PagerAdapter;
+import com.callee.calleeclient.R;
 import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.database.dbDriver;
+import com.callee.calleeclient.thread.UpdateThread;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -35,10 +39,11 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        Global.db = new dbDriver();
+        if(Global.db==null) {
+            Global.db = new dbDriver();
+        }
         Global.db.openConnection(this);
-        //Global.db.restoreDB();
-        Global.db.setCredentials("Lorenzo De Nisi", "denisilorenzo@gmail.com", "+393338846260"); //TODO add welcome activity
+
         Global.db.joinDbThread();
 
         fetchCredentials();
@@ -91,7 +96,6 @@ public class HomeActivity extends AppCompatActivity {
     public void onDestroy() {
         this.unregisterReceiver(broadcastReceiver);
         super.onDestroy();
-        Global.db.closeConnection();
     }
 
     private void fetchInformations() {

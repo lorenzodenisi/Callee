@@ -255,8 +255,16 @@ public class Message implements Parcelable {
                 return ToM.UPDATEREQUEST;
             case "UPDATERESPONSE":
                 return ToM.UPDATERESPONSE;
-            default:
-                return null;
+            case "REGISTERUSER":
+                return ToM.REGISTERUSER;
+            case "REGISTERUSERRESPONSE":
+                return ToM.REGISTERUSERRESPONSE;
+            case "REGISTERCONFIRM":
+                return ToM.REGISTERCONFIRM;
+            case "REGISTERCONFIRMRESPONSE":
+                return ToM.REGISTERCONFIRMRESPONSE;
+
+            default:return null;
         }
     }
 

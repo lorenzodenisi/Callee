@@ -4,4 +4,17 @@
     <string name="hello_world">Hello World!</string>
     <string name="placeholder">placeholder</string>
     <string name="messageHint">Type something</string>
+
+    <string name="login_text2">A mail will be sent to the email address above with a 6 digit code that you will be asked to put later</string>
+    <string name="login_text1">Create or login to an account</string>
+    <string name="login_username">Username</string>
+    <string name="login_username_hint">your username</string>
+    <string name="login_email">Email</string>
+    <string name="login_email_hint">your email</string>
+    <string name="login_done">DONE</string>
+    <string name="login_email_confirmation">Email\nconfirmation</string>
+    <string name="login_email_confirmation_hint">retype your email</string>
+
+    <string name="auth_text1">Type here the code that has been sent to your email</string>
+    <string name="auth_confirm">CONFIRM</string>
 </resources>

@@ -4,7 +4,7 @@ class Query {
 
     static String SQL_CREATE_CREDENTIALS =
             "  CREATE TABLE IF NOT EXISTS CREDENTIALS(\n" +
-                    "  username TEXT NOT NULL UNIQUE ,\n" +
+                    "  username TEXT NOT NULL ,\n" +
                     "  email TEXT PRIMARY KEY NOT NULL ,\n" +
                     "  number TEXT\n" +
                     ")\n";

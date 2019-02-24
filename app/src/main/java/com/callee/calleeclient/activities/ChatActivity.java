@@ -1,4 +1,4 @@
-package com.callee.calleeclient;
+package com.callee.calleeclient.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,14 +13,16 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.callee.calleeclient.Global;
+import com.callee.calleeclient.R;
 import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.client.ToM;
 import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.database.dbDriver;
 import com.callee.calleeclient.fragments.MessageListFragment;
+import com.callee.calleeclient.thread.SendMessageThread;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -41,7 +43,9 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.chat);
 
         //open database
-        Global.db = new dbDriver();
+        if(Global.db==null) {
+            Global.db = new dbDriver();
+        }
         Global.db.openConnection(this);
 
         Bundle b = this.getIntent().getBundleExtra("data");
@@ -99,7 +103,6 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         this.unregisterReceiver(broadcastReceiver);
-        Global.db.closeConnection();
         super.onDestroy();
     }
 

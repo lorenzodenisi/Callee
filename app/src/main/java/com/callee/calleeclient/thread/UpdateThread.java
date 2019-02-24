@@ -1,8 +1,9 @@
-package com.callee.calleeclient;
+package com.callee.calleeclient.thread;
 
 import android.content.Context;
 import android.content.Intent;
 
+import com.callee.calleeclient.Global;
 import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.client.ToM;

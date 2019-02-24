@@ -306,10 +306,10 @@ public class dbDriver {
         }
     }
 
-    public long getLastUpdate(){
+    public long getLastUpdate() {
         Cursor c = dbReadable.rawQuery("SELECT MAX(timestamp) FROM MESSAGES", null);
         c.moveToNext();
-        long l= c.getLong(0);
+        long l = c.getLong(0);
         c.close();
 
         return l;
@@ -348,7 +348,4 @@ public class dbDriver {
             res[0] = false;
         }
     }
-
-
-    //TODO retrieve last Updated
 }

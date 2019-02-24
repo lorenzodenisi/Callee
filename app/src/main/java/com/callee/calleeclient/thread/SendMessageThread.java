@@ -1,5 +1,6 @@
-package com.callee.calleeclient;
+package com.callee.calleeclient.thread;
 
+import com.callee.calleeclient.Global;
 import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.ToM;
 import com.callee.calleeclient.database.dbDriver;

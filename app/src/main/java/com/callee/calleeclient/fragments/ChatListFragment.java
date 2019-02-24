@@ -3,14 +3,12 @@ package com.callee.calleeclient.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.text.style.UpdateAppearance;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.SimpleAdapter;
 
-import com.callee.calleeclient.ChatActivity;
+import com.callee.calleeclient.activities.ChatActivity;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.R;
 

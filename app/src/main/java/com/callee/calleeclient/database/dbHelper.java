@@ -46,4 +46,8 @@ public class dbHelper extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
+    @Override
+    public synchronized void close() {
+        super.close();
+    }
 }
