@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#92000000">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:background="@android:color/white"
+        android:elevation="5dp"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="30dp"
+            android:text="Type here the email of new contact."
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/new_contact_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="30dp"
+            android:backgroundTint="@color/colorAccent"
+            android:inputType="textEmailAddress"
+            android:lines="1"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/new_contact_popup_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:onClick="ConfirmAction"
+            android:text="CONFIRM"
+
+            android:textColor="@color/colorPrimaryDark" />
+
+
+    </LinearLayout>
+</FrameLayout>

@@ -25,6 +25,7 @@ import com.callee.calleeclient.database.dbDriver;
 import com.callee.calleeclient.thread.RegisterThread;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -33,7 +34,7 @@ import static java.lang.System.currentTimeMillis;
 public class WelcomeActivity extends AppCompatActivity {
 
     private static boolean auth;        //indicates which fragment need to be reloaded
-    private LoginFragment loginFragment;
+    LoginFragment loginFragment;
     private AuthFragment authFragment;
 
     public static RegisterThread rt;
@@ -110,7 +111,7 @@ public class WelcomeActivity extends AppCompatActivity {
             String email = mail.getText().toString();
             String email_confirm = mail_confirm.getText().toString();
 
-            if (userPattern.matcher(user).matches()) {
+            if (userPattern.matcher(user).matches() || user.equals("")) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     username.setBackgroundTintList(getResources().getColorStateList(android.R.color.holo_red_dark));
                 }
@@ -119,12 +120,12 @@ public class WelcomeActivity extends AppCompatActivity {
                 username.setHintTextColor(getResources().getColorStateList(android.R.color.holo_red_light));
             }
 
-            if (!mailPattern.matcher(email).matches()) {
+            if (!mailPattern.matcher(email).matches() || email.equals("")) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     mail.setBackgroundTintList(getResources().getColorStateList(android.R.color.holo_red_dark));
                 }
                 mail.setText("");
-                mail.setHint("Wrong email address");
+                mail.setHint("Wrong emailField address");
                 mail.setHintTextColor(getResources().getColorStateList(android.R.color.holo_red_light));
             }
 
@@ -153,7 +154,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 int res = 0;
                 //wait thread to complete register first message
                 try {
-                    res = rt.in1.read();     //1=OK -1=ERROR
+                    res = rt.in1.read();     //1=OK 0=ERROR
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -226,7 +227,8 @@ public class WelcomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int code = Integer.parseInt(codeField.getText().toString());
                 try {
-                    rT.out2.write(Integer.toString(code).getBytes());        //write to thread the code typed in the field
+                    String codeString = String.format(Locale.ENGLISH, "%06d", code);
+                    rT.out2.write(codeString.getBytes());        //write to thread the code typed in the field
                     res = rT.in1.read();        //read from thread the result of second part of registration
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -235,6 +237,17 @@ public class WelcomeActivity extends AppCompatActivity {
                 if (res == 1) {
                     Intent intent = new Intent(getActivity(), HomeActivity.class);
                     startActivity(intent);
+                }
+                if (res == 0){
+                    codeField.setText("");
+                    codeField.setHint("Wrong code!");
+                }
+                if(res==2){
+                    WelcomeActivity parent = (WelcomeActivity) getActivity();
+                    parent.loginFragment=new LoginFragment();
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.welcome_activity_container, parent.loginFragment , "login fragment").commit();
+
                 }
             }
         }

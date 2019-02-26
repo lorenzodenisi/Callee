@@ -63,7 +63,7 @@ public class ChatActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("");
 
-        //fill user and email on appbar
+        //fill user and emailField on appbar
         TextView user = findViewById(R.id.chat_username);
         user.setText(chatData.getUser());
         TextView email = findViewById(R.id.chat_email);
@@ -78,7 +78,7 @@ public class ChatActivity extends AppCompatActivity {
 
         b = new Bundle();
         b.putParcelableArrayList("messages", messages);
-        b.putString("user_email", chatData.getEmail());     //send also email of other user
+        b.putString("user_email", chatData.getEmail());     //send also emailField of other user
         msgListFragment = new MessageListFragment();
         msgListFragment.setArguments(b);
         fm.beginTransaction().add(R.id.messagelist_container, msgListFragment, "messageList").commit();

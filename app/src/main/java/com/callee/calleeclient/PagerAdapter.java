@@ -1,12 +1,16 @@
 package com.callee.calleeclient;
 
 import android.os.Bundle;
+import android.support.annotation.ArrayRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.widget.Button;
 
 import com.callee.calleeclient.client.SingleChat;
+import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.fragments.ChatListFragment;
+import com.callee.calleeclient.fragments.ContactFragment;
 import com.callee.calleeclient.fragments.UserInfoActivityFragment;
 
 import java.util.ArrayList;
@@ -14,20 +18,23 @@ import java.util.ArrayList;
 public class PagerAdapter extends FragmentPagerAdapter {
 
     private ArrayList<SingleChat> chats;
+    private ArrayList<Contact> contacts;
     private ChatListFragment cF;
+    private ContactFragment contactF;
 
     private ArrayList<SingleChat> newChats;
+    private Contact newContact;
 
-    PagerAdapter(FragmentManager fm, ArrayList<SingleChat> chats){
+    public PagerAdapter(FragmentManager fm, ArrayList<SingleChat> chats, ArrayList<Contact> contacts){
         super(fm);
         this.chats=chats;
+        this.contacts=contacts;
     }
 
     @Override
     public Fragment getItem(int i) {
 
         switch (i){
-            case 2:     //TODO list of users
             case 0: return new UserInfoActivityFragment();
             case 1: {
                 Bundle b=new Bundle();
@@ -35,6 +42,13 @@ public class PagerAdapter extends FragmentPagerAdapter {
                 b.putParcelableArrayList("chats", chats);
                 cF.setArguments(b);
                 return cF;
+            }
+            case 2:{
+                Bundle b = new Bundle();
+                contactF=new ContactFragment();
+                b.putParcelableArrayList("contacts", contacts);
+                contactF.setArguments(b);
+                return contactF;
             }
             default:return null;
         }
@@ -55,15 +69,28 @@ public class PagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-   public void updateData(ArrayList<SingleChat> newChats){
+   public void updateChats(ArrayList<SingleChat> newChats){
         this.newChats=newChats;
         this.notifyDataSetChanged();
     }
 
+
+   public void updateContacts(Contact newContact){
+        this.newContact=newContact;
+        this.notifyDataSetChanged();
+   }
+
     @Override
     public int getItemPosition(Object object){
-        if(object instanceof ChatListFragment){
+        if(object instanceof ChatListFragment && newChats!=null){
             ((ChatListFragment) object).updateData(newChats);
+            newChats=null;
+        }
+
+        if(object instanceof ContactFragment && newContact!=null){
+            ((ContactFragment)object).addContact(newContact);
+            newContact=null;
+
         }
         return super.getItemPosition(object);
     }

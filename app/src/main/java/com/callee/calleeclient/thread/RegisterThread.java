@@ -52,14 +52,14 @@ public class RegisterThread extends Thread {
             String content = bufferedReader.readLine();
 
             if (content == null) {
-                out1.write(-1);  //ERROR
+                out1.write(0);  //ERROR
                 return;
             }
             JSONObject obj = new JSONObject(content);
             Message response = new Message(obj);
 
             if (response.getType() != ToM.REGISTERUSERRESPONSE || (!response.getText().equals("OK"))) {
-                out1.write(-1);  //ERROR
+                out1.write(0);  //ERROR
                 return;
             }
 
@@ -70,28 +70,42 @@ public class RegisterThread extends Thread {
 
             if (stopped) return;
 
-            byte[] codeByte = new byte[6];
-            in2.read(codeByte);
-            if (stopped) return;
-            int code = Integer.parseInt(new String(codeByte));
+            int i;
+            for(i=0; i<Global.MAXAUTHATTEMPT; i++) {
 
-            message.setType(ToM.REGISTERCONFIRM);
-            message.putText(Integer.toString(code));
+                byte[] codeByte = new byte[6];
+                in2.read(codeByte);
+                if (stopped) return;
+                int code;
 
-            outW.append(this.message.toJSON()).append("\n").flush();     //send message
-            content = bufferedReader.readLine();                        //receive message
+                try{
+                    code= Integer.parseInt(new String(codeByte));
+                }catch (NumberFormatException e){
+                    continue;
+                }
 
-            if (content == null) {
-                out1.write(-1);  //ERROR
-                return;
-            }
+                message.setType(ToM.REGISTERCONFIRM);
+                message.putText(Integer.toString(code));
 
-            obj = new JSONObject(content);
-            response = new Message(obj);
+                outW.append(this.message.toJSON()).append("\n").flush();     //send message
+                content = bufferedReader.readLine();                        //receive message
 
-            if (response.getType() != ToM.REGISTERCONFIRMRESPONSE | (!response.getText().equals("OK"))) {
-                out1.write(-1);  //ERROR
-                return;
+                if (content == null) {
+                    out1.write(0);  //ERROR
+                    return;
+                }
+
+                obj = new JSONObject(content);
+                response = new Message(obj);
+
+
+                if (response.getType() != ToM.REGISTERCONFIRMRESPONSE || (!response.getText().equals("OK"))) {
+                    if(i==Global.MAXAUTHATTEMPT-1){
+                        out1.write(2);     //LAST ERROR
+                        return;
+                    }
+                    out1.write(0);  //ERROR
+                }else break;
             }
 
             Global.db.setCredentials(response.getToName(), response.getToEmail(), null);

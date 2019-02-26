@@ -222,7 +222,7 @@ public class dbDriver {
 
         @Override
         public void run() {
-            String order = "CONTACTS.username DESC";
+            String order = "CONTACTS.username ASC";
             Cursor c = dbReadable.query("CONTACTS", null, null, null, null, null, order);
 
             String user, email, number;

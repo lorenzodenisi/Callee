@@ -3,18 +3,12 @@ package com.callee.calleeclient.client;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class SingleChat implements Parcelable {
+public class SingleChat implements Parcelable, Comparable {
     private String user;
     private int newMessages;
     private String lastMessagePreview;
     private Long lastMessageTime;
     private String email;
-
-    public SingleChat(String name) {
-        this.user = name;
-        this.newMessages = 0;
-        this.lastMessagePreview = "";
-    }
 
     public SingleChat(String name, String email, String lastMessagePreview, int newMessages, Long lastMessageTime) {
         this.user = name;
@@ -106,4 +100,11 @@ public class SingleChat implements Parcelable {
             return new SingleChat[size];
         }
     };
+
+    @Override
+    public int compareTo(Object o) {
+        SingleChat s = (SingleChat) o;
+
+        return (int) (s.getLastMessageTime() - this.lastMessageTime);
+    }
 }

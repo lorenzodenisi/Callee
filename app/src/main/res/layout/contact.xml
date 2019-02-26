@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    >
+
+    <ImageView
+        android:id="@+id/contact_icon"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_weight="1"
+        android:padding="5dp"
+        android:src="@mipmap/ic_app"
+        />
+
+    <TableLayout
+        android:layout_width="0dp"
+        android:layout_weight="8"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        >
+
+        <TableRow>
+            <TextView
+                android:id="@+id/contactName"
+                android:text="contact name"
+                android:textAlignment="textStart"
+                android:textSize="20sp"
+
+                />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:id="@+id/contactEmail"
+                android:text="contact email"
+                android:textAlignment="textStart"
+                android:textSize="12sp"
+                />
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>

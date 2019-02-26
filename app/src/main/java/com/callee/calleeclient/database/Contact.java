@@ -1,6 +1,12 @@
 package com.callee.calleeclient.database;
 
-public class Contact {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.Comparator;
+
+
+public class Contact implements Parcelable, Comparable {
 
     private String name;
     private String email;
@@ -34,5 +40,43 @@ public class Contact {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    //code for make SingleChat parselable
+    public Contact(Parcel p) {
+        String[] data = new String[5];
+
+        p.readStringArray(data);
+        this.name = data[0];
+        this.email = data[1];
+        this.number = data[2];
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringArray(new String[]{this.name, this.email,
+                this.number});
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Contact createFromParcel(Parcel in) {
+            return new Contact(in);
+        }
+
+        public Contact[] newArray(int size) {
+            return new Contact[size];
+        }
+    };
+
+    @Override
+    public int compareTo(Object o) {
+        Contact c = (Contact)o;
+
+        return this.name.compareTo(c.getName());
     }
 }

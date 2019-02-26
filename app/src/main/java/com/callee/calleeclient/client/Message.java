@@ -263,6 +263,8 @@ public class Message implements Parcelable {
                 return ToM.REGISTERCONFIRM;
             case "REGISTERCONFIRMRESPONSE":
                 return ToM.REGISTERCONFIRMRESPONSE;
+            case "CONFIRMCONTACT":
+                return ToM.CONFIRMCONTACT;
 
             default:return null;
         }
