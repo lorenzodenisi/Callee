@@ -73,8 +73,8 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mViewPager = (ViewPager) findViewById(R.id.mainPager);
-        mViewPager.addOnPageChangeListener(new PagerListener(this));
         mAdapter = new PagerAdapter(this.getSupportFragmentManager(), this.chats, this.contacts);
+        mViewPager.addOnPageChangeListener(new PagerListener(this, mAdapter));
         mViewPager.setAdapter(mAdapter);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
@@ -160,11 +160,12 @@ public class HomeActivity extends AppCompatActivity {
 
         FloatingActionButton button;
         Activity activity;
+        PagerAdapter adapter;
 
-        public PagerListener(Activity a) {
+        public PagerListener(Activity a, PagerAdapter p) {
             button = findViewById(R.id.new_button);
             this.activity = a;
-
+            this.adapter =p;
         }
 
         @Override
@@ -177,11 +178,13 @@ public class HomeActivity extends AppCompatActivity {
             switch (i) {
                 case 0:
                     button.hide();
+                    adapter.removeContactInfo();
                     break;
 
                 case 1:
                     button.show();
                     button.setOnClickListener(new newMessageListener(activity));
+                    adapter.removeContactInfo();
                     break;
 
                 case 2:

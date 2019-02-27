@@ -1,17 +1,15 @@
 package com.callee.calleeclient;
 
 import android.os.Bundle;
-import android.support.annotation.ArrayRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.widget.Button;
 
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.fragments.ChatListFragment;
 import com.callee.calleeclient.fragments.ContactFragment;
-import com.callee.calleeclient.fragments.UserInfoActivityFragment;
+import com.callee.calleeclient.fragments.UserInfoFragment;
 
 import java.util.ArrayList;
 
@@ -21,6 +19,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
     private ArrayList<Contact> contacts;
     private ChatListFragment cF;
     private ContactFragment contactF;
+    private UserInfoFragment uF;
 
     private ArrayList<SingleChat> newChats;
     private Contact newContact;
@@ -35,7 +34,13 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int i) {
 
         switch (i){
-            case 0: return new UserInfoActivityFragment();
+            case 0: {
+                uF = new UserInfoFragment();
+                Bundle b = new Bundle();
+                b.putParcelable("contact", new Contact(Global.username, Global.email, null));
+                uF.setArguments(b);
+                return uF;
+            }
             case 1: {
                 Bundle b=new Bundle();
                 cF= new ChatListFragment();
@@ -93,5 +98,10 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
         }
         return super.getItemPosition(object);
+    }
+
+    public void removeContactInfo(){
+        if(contactF!=null)
+            this.contactF.removeUserInfo();
     }
 }
