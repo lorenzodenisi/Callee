@@ -1,5 +1,6 @@
 package com.callee.calleeclient.activities;
 
+import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.TransitionSet;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -165,7 +167,7 @@ public class HomeActivity extends AppCompatActivity {
         public PagerListener(Activity a, PagerAdapter p) {
             button = findViewById(R.id.new_button);
             this.activity = a;
-            this.adapter =p;
+            this.adapter = p;
         }
 
         @Override
@@ -218,6 +220,7 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
+            popup.setAnimationStyle(R.style.PopupAnimation);
             popup.showAtLocation(popupLayout, Gravity.CENTER, 0, 0);
             confirmButton = popupLayout.findViewById(R.id.new_contact_popup_button);
             confirmButton.setOnClickListener(new ConfirmListener(popupLayout, popup));
@@ -318,7 +321,9 @@ public class HomeActivity extends AppCompatActivity {
 
             }
 
+            popup.setAnimationStyle(R.style.PopupAnimation);
             popup.showAtLocation(popupLayout, Gravity.CENTER, 0, 0);
+
 
             list.setOnItemClickListener((parent, view, position, id) -> {
 

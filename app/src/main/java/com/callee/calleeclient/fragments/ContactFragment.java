@@ -42,7 +42,9 @@ public class ContactFragment extends Fragment {
         b.putBoolean("isUser", false);
         uF = new UserInfoFragment();
         uF.setArguments(b);
-        getChildFragmentManager().beginTransaction().add(R.id.contacts_list_container, uF).commit();
+        getChildFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.fadein, R.anim.fadeout)
+                .add(R.id.contacts_list_container, uF).commit();
         isUserShowing = true;
 
         if (newButton != null) {
@@ -54,7 +56,9 @@ public class ContactFragment extends Fragment {
     public void removeUserInfo() {
         System.out.println();
         if (uF != null && isUserShowing) {
-            getChildFragmentManager().beginTransaction().remove(uF).commit();
+            getChildFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.anim.fadein, R.anim.fadeout)
+                    .remove(uF).commit();
             isUserShowing = false;
             if (newButton != null)
                 newButton.show();
@@ -65,7 +69,9 @@ public class ContactFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         list = new ContactListFragment();
         list.setArguments(getArguments());
-        getChildFragmentManager().beginTransaction().replace(R.id.contacts_list_container, list).commit();
+        getChildFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.fadein, R.anim.fadeout)
+                .replace(R.id.contacts_list_container, list).commit();
     }
 
     public static class ContactListFragment extends ListFragment {
