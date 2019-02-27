@@ -1,6 +1,7 @@
 package com.callee.calleeclient.fragments;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -19,6 +20,8 @@ public class ContactFragment extends Fragment {
 
     ContactListFragment list;
     UserInfoFragment uF;
+    Boolean isUserShowing = false;
+    FloatingActionButton newButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -29,6 +32,10 @@ public class ContactFragment extends Fragment {
         list.addContact(c);
     }
 
+    public void setNewButton(FloatingActionButton button) {
+        this.newButton = button;
+    }
+
     public void showUserInfo(Contact c) {
         Bundle b = new Bundle();
         b.putParcelable("contact", c);
@@ -36,11 +43,22 @@ public class ContactFragment extends Fragment {
         uF = new UserInfoFragment();
         uF.setArguments(b);
         getChildFragmentManager().beginTransaction().add(R.id.contacts_list_container, uF).commit();
+        isUserShowing = true;
+
+        if (newButton != null) {
+            newButton.hide();
+        }
+
     }
 
-    public void removeUserInfo(){
-        if(uF!=null)
+    public void removeUserInfo() {
+        System.out.println();
+        if (uF != null && isUserShowing) {
             getChildFragmentManager().beginTransaction().remove(uF).commit();
+            isUserShowing = false;
+            if (newButton != null)
+                newButton.show();
+        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.callee.calleeclient;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,11 +25,13 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     private ArrayList<SingleChat> newChats;
     private Contact newContact;
+    private Activity parent;
 
-    public PagerAdapter(FragmentManager fm, ArrayList<SingleChat> chats, ArrayList<Contact> contacts){
+    public PagerAdapter(FragmentManager fm, ArrayList<SingleChat> chats, ArrayList<Contact> contacts, Activity parent){
         super(fm);
         this.chats=chats;
         this.contacts=contacts;
+        this.parent=parent;
     }
 
     @Override
@@ -51,6 +55,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
             case 2:{
                 Bundle b = new Bundle();
                 contactF=new ContactFragment();
+                contactF.setNewButton(parent.findViewById(R.id.new_button));
                 b.putParcelableArrayList("contacts", contacts);
                 contactF.setArguments(b);
                 return contactF;

@@ -61,7 +61,9 @@ public class UserInfoFragment extends Fragment {
     }
 
     public void setBackButton(){
+
         button.show();
-        button.setOnClickListener((v)->getFragmentManager().beginTransaction().remove(this).commit());
-    }
+        //button.setOnClickListener((v)->getFragmentManager().beginTransaction().remove(this).commit());
+        button.setOnClickListener((v)->((ContactFragment)getParentFragment()).removeUserInfo());
+        }
 }

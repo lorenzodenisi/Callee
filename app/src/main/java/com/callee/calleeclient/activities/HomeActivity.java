@@ -73,7 +73,7 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mViewPager = (ViewPager) findViewById(R.id.mainPager);
-        mAdapter = new PagerAdapter(this.getSupportFragmentManager(), this.chats, this.contacts);
+        mAdapter = new PagerAdapter(this.getSupportFragmentManager(), this.chats, this.contacts, this);
         mViewPager.addOnPageChangeListener(new PagerListener(this, mAdapter));
         mViewPager.setAdapter(mAdapter);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
