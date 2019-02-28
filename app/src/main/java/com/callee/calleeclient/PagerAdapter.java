@@ -14,6 +14,7 @@ import com.callee.calleeclient.fragments.ContactFragment;
 import com.callee.calleeclient.fragments.UserInfoFragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PagerAdapter extends FragmentPagerAdapter {
 
@@ -27,9 +28,9 @@ public class PagerAdapter extends FragmentPagerAdapter {
     private Contact newContact;
     private Activity parent;
 
-    public PagerAdapter(FragmentManager fm, ArrayList<SingleChat> chats, ArrayList<Contact> contacts, Activity parent){
+    public PagerAdapter(FragmentManager fm, List<SingleChat> chats, ArrayList<Contact> contacts, Activity parent){
         super(fm);
-        this.chats=chats;
+        this.chats=(ArrayList)chats;
         this.contacts=contacts;
         this.parent=parent;
     }

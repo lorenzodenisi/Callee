@@ -24,16 +24,17 @@ class Query {
                     "  fromEmail TEXT NOT NULL REFERENCES CONTACTS(email) ON UPDATE NO ACTION ON DELETE NO ACTION ,\n" +
                     "  toEmail TEXT NOT NULL REFERENCES CONTACTS(email) ON UPDATE NO ACTION ON DELETE NO ACTION,\n" +
                     "  timestamp BIGINT UNSIGNED NOT NULL,\n" +
-                    "  text TEXT\n" +
-                    ")\n";
+                    "  text TEXT,\n" +
+                    "  read INTEGER DEFAULT 0\n" +
+                    ");\n";
 
     static String SQL_CREATE_CHATS =
             "CREATE TABLE IF NOT EXISTS CHATS(\n" +
                     "  user TEXT NOT NULL REFERENCES CONTACTS(username) ON UPDATE CASCADE ON DELETE NO ACTION ,\n" +
                     "  email TEXT PRIMARY KEY NOT NULL REFERENCES CONTACTS(email) ON UPDATE CASCADE ON DELETE NO ACTION ,\n" +
-                    "  newMessages INTEGER NOT NULL ,\n" +
-                    "  lastMessagePreview TEXT,\n" +
-                    "  lastMessageTime BIGINT UNSIGNED NOT NULL\n" +
+                    "  newMessages INTEGER NOT NULL, \n" +
+                    "  lastMessagePreview TEXT, \n" +
+                    "  lastMessageTS BIGINT UNSIGNED NOT NULL\n" +
                     ")\n";
 
 

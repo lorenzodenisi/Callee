@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -22,13 +23,23 @@ import com.callee.calleeclient.client.ToM;
 import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.database.dbDriver;
 import com.callee.calleeclient.fragments.MessageListFragment;
+import com.callee.calleeclient.thread.ConfirmReadThread;
 import com.callee.calleeclient.thread.SendMessageThread;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static java.lang.System.currentTimeMillis;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -76,6 +87,9 @@ public class ChatActivity extends AppCompatActivity {
             System.out.println("Error retrieving messages");
         }
 
+        if(chatData.getNewMessages()>0)
+            updateRead();
+
         b = new Bundle();
         b.putParcelableArrayList("messages", messages);
         b.putString("user_email", chatData.getEmail());     //send also emailField of other user
@@ -101,9 +115,43 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onDestroy() {
+    public void onPause(){
+        ArrayList<SingleChat> updt = new ArrayList<>();
+        updt.add(chatData);
+        Global.db.updateChats(updt);
+        if(! Global.db.joinDbThread()){
+            System.err.println("Error updating chat");
+        }
         this.unregisterReceiver(broadcastReceiver);
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed(){
+        NavUtils.navigateUpFromSameTask(this);      //emulate actionbar back button
+    }
+
+
+    private boolean updateRead(){
+        for(Message m: messages){
+            if(!m.getRead()){
+                m.setRead(true);
+            }
+        }
+        Message confirmMessage = new Message(-1L, Global.username, "SERVER", Global.email,
+                "server@server.server", System.currentTimeMillis(), ToM.CONFIRMREAD);
+        confirmMessage.putText(chatData.getEmail());
+
+        ConfirmReadThread confirm = new ConfirmReadThread(confirmMessage);
+        confirm.start();
+        chatData.setNewMessages(0);
+
+        return confirm._join();
     }
 
     private class sendButtonOnClickListener implements View.OnClickListener {
@@ -130,6 +178,9 @@ public class ChatActivity extends AppCompatActivity {
 
                 msgListFragment.addMessage(toSend);
                 msgListFragment.scrollDown();
+
+                chatData.setLastMessagePreview(content);
+                chatData.setLastMessageTime(currentTimeMillis());
             }
         }
     }

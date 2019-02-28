@@ -75,7 +75,8 @@ public class Message implements Parcelable {
                 "From: " + this.getFromName() + " (" + this.getFromEmail() + ")\n" +
                 "To: " + this.getToName() + " (" + this.getToEmail() + ")\n" +
                 "Sent: " + this.getTimestamp()) + "\n" +
-                "Text: " + this.getText();
+                "Text: " + this.getText()+"\n" +
+                "Read: " + this.getRead();
 
         return str;
     }
@@ -244,6 +245,25 @@ public class Message implements Parcelable {
         return Message.getFormattedTime(Long.valueOf(this.getTimestamp()));
     }
 
+    public void setRead(boolean value){
+        try{
+            this.content.put("read", value);
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
+
+    public boolean getRead(){
+        if (this.content.has("read")) {
+            try {
+                return (boolean) this.content.get("read");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else return false;
+    }
+
     static public ToM getType(String type) {
         switch (type) {
 
@@ -265,6 +285,8 @@ public class Message implements Parcelable {
                 return ToM.REGISTERCONFIRMRESPONSE;
             case "CONFIRMCONTACT":
                 return ToM.CONFIRMCONTACT;
+            case "CONFIRMREAD":
+                return ToM.CONFIRMREAD;
 
             default:return null;
         }
@@ -279,7 +301,7 @@ public class Message implements Parcelable {
 
     //code for make Message parselable
     public Message(Parcel p) {
-        String[] data = new String[8];
+        String[] data = new String[9];
 
         p.readStringArray(data);
         this.setId(Long.parseLong(data[0]));
@@ -290,6 +312,7 @@ public class Message implements Parcelable {
         this.setTimestamp(Long.parseLong(data[5]));
         this.setType(getType(data[6]));
         this.putText(data[7]);
+        this.setRead(Boolean.parseBoolean(data[8]));
     }
 
     @Override
@@ -302,12 +325,13 @@ public class Message implements Parcelable {
         dest.writeStringArray(new String[]{
                 this.getId().toString(),
                 this.getFromName(),
-                this.getToEmail(),
-                this.getFromEmail(),
                 this.getToName(),
+                this.getFromEmail(),
+                this.getToEmail(),
                 this.getTimestamp(),
                 this.getType().toString(),
-                this.getText()
+                this.getText(),
+                (Boolean.valueOf(this.getRead())).toString()
         });
     }
 

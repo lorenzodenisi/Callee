@@ -86,9 +86,11 @@ public class SingleChat implements Parcelable, Comparable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[]{this.user, this.email,
+        dest.writeStringArray(new String[]{this.user,
+                this.email,
                 String.valueOf(this.newMessages),
-                this.lastMessagePreview, this.lastMessageTime.toString()});
+                this.lastMessagePreview,
+                this.lastMessageTime.toString()});
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

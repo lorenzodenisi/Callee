@@ -13,7 +13,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.TransitionSet;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +39,7 @@ import com.callee.calleeclient.thread.addContactThread;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -50,8 +50,9 @@ public class HomeActivity extends AppCompatActivity {
     private UpdateThread updateService;
     private HomeBReceiver broadcastReceiver;
 
-    private ArrayList<SingleChat> chats;
+    private LinkedHashMap<String, SingleChat> chats;
     private ArrayList<Contact> contacts;
+    private static boolean isThreadRunning=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,20 +63,31 @@ public class HomeActivity extends AppCompatActivity {
             Global.db = new dbDriver();
         }
         Global.db.openConnection(this);
-
         Global.db.joinDbThread();
 
         fetchCredentials();
-        fetchInformations();
+        if(!isThreadRunning && (updateService==null || !updateService.isAlive())) {
+            updateService = new UpdateThread(this, Global.db, 5000, Global.db.getLastUpdate());
+            updateService.start();
+            isThreadRunning=true;
+        }
+    }
 
-        updateService = new UpdateThread(this, Global.db, 5000, Global.db.getLastUpdate());
-        updateService.start();
+    @Override
+    public void onStart(){
+
+        //setting bradcast receiver
+        broadcastReceiver = new HomeBReceiver();
+        this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
+
+        fetchInformations();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         mViewPager = (ViewPager) findViewById(R.id.mainPager);
-        mAdapter = new PagerAdapter(this.getSupportFragmentManager(), this.chats, this.contacts, this);
+
+        mAdapter = new PagerAdapter(this.getSupportFragmentManager(), new ArrayList<>(this.chats.values()), this.contacts, this);
         mViewPager.addOnPageChangeListener(new PagerListener(this, mAdapter));
         mViewPager.setAdapter(mAdapter);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
@@ -83,12 +95,10 @@ public class HomeActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
         mViewPager.setCurrentItem(1);     //default tab
 
-        //setting bradcast receiver
-        broadcastReceiver = new HomeBReceiver();
-        this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
-
+        super.onStart();
         //TODO add custom width to tabs (maybe icons) extension needed
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -113,15 +123,17 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onDestroy() {
+    public void onPause(){
         this.unregisterReceiver(broadcastReceiver);
-        super.onDestroy();
+        super.onPause();
     }
 
+
     private void fetchInformations() {
-        this.chats = new ArrayList<>();
+        this.chats = new LinkedHashMap<>();
         Global.db.getChats(chats);
         Global.db.joinDbThread();
+
         this.contacts = new ArrayList<>();
         Global.db.getContacts(contacts);
         Global.db.joinDbThread();
@@ -152,8 +164,13 @@ public class HomeActivity extends AppCompatActivity {
 
             ArrayList<Message> ms = intent.getParcelableArrayListExtra("messages");
             ArrayList<SingleChat> newChats = intent.getParcelableArrayListExtra("chats");
-            if (!newChats.isEmpty())
-                mAdapter.updateChats(newChats);
+
+            chats.clear();
+            for (SingleChat c: newChats){
+                chats.put(c.getEmail(), c);
+            }
+
+            mAdapter.updateChats(newChats);
         }
     }
 
@@ -337,13 +354,13 @@ public class HomeActivity extends AppCompatActivity {
 
         SingleChat chat = null;
 
-        for (SingleChat ch : chats) {
+        for (SingleChat ch : chats.values()) {
             if (ch.getEmail().equals(c.getEmail()))
                 chat = ch;
         }
         if (chat == null) {     //new chat
             chat = new SingleChat(c.getName(), c.getEmail(), "", 0, 0L);
-            chats.add(chat);
+            chats.put(chat.getEmail(),chat);
             Global.db.putChat(chat);
         }
 
@@ -355,6 +372,5 @@ public class HomeActivity extends AppCompatActivity {
         if (Global.db.joinDbThread()) {
             startActivity(intent);
         }
-
     }
 }

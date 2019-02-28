@@ -6,11 +6,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
+import com.callee.calleeclient.Global;
 import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.client.ToM;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class dbDriver {
@@ -109,6 +111,37 @@ public class dbDriver {
             }
             cursor.close();
         }
+    }
+
+    public void confirmRead(String email, Long timestamp){
+        res[0]=true;
+        dbThread= new Thread(new confirmReadRunnable(email, timestamp));
+        dbThread.setUncaughtExceptionHandler(handler);
+        dbThread.start();
+    }
+
+    private class confirmReadRunnable implements Runnable{
+
+        String email;
+        Long timestamp;
+
+        public confirmReadRunnable(String email, Long timestamp){
+            this.email=email;
+            this.timestamp=timestamp;
+        }
+
+        @Override
+        public void run(){
+            ContentValues cv=new ContentValues();
+            cv.put("read", "1");
+            String condition = "fromEmail = ? AND toEmail= ? AND timestamp <= ?";
+
+            if(dbWritable.update("MESSAGES", cv, condition, new String[]{email, Global.email, timestamp.toString()})==-1){
+                System.err.println("Error updating message to database");
+                throw new SQLiteException();
+            }
+        }
+
     }
 
     public void setCredentials(String user, String email, String number) {
@@ -239,7 +272,7 @@ public class dbDriver {
         }
     }
 
-    public void getChats(ArrayList<SingleChat> chats) {
+    public void getChats(HashMap<String, SingleChat> chats) {
         res[0] = true;
         dbThread = new Thread(new getChatsRunnable(chats));
         dbThread.setUncaughtExceptionHandler(handler);
@@ -248,29 +281,29 @@ public class dbDriver {
 
     private class getChatsRunnable implements Runnable {
 
-        ArrayList[] chats = new ArrayList[1];
+        HashMap[] chats = new HashMap[1];
 
-        getChatsRunnable(ArrayList<SingleChat> chats) {
+        getChatsRunnable(HashMap<String, SingleChat> chats) {
             this.chats[0] = chats;
         }
 
         @Override
         public void run() {
-            String order = "CHATS.lastMessageTime";
+            String order = "lastMessageTS DESC";
             Cursor c = dbReadable.query("CHATS", null, null, null, null, null, order);
 
             String user, email, lastMessagePreview;
-            long lastMessageTime;
             int newMessages;
+            long lastMessageTS;
 
             while (c.moveToNext()) {
                 user = c.getString(c.getColumnIndexOrThrow("user"));
                 email = c.getString(c.getColumnIndexOrThrow("email"));
-                lastMessagePreview = c.getString(c.getColumnIndexOrThrow("lastMessagePreview"));
                 newMessages = c.getInt(c.getColumnIndexOrThrow("newMessages"));
-                lastMessageTime = c.getLong(c.getColumnIndexOrThrow("lastMessageTime"));
+                lastMessagePreview=c.getString(c.getColumnIndexOrThrow("lastMessagePreview"));
+                lastMessageTS=c.getLong(c.getColumnIndexOrThrow("lastMessageTS"));
 
-                chats[0].add(new SingleChat(user, email, lastMessagePreview, newMessages, lastMessageTime));
+                chats[0].put(email, new SingleChat(user, email, lastMessagePreview, newMessages, lastMessageTS));
             }
 
             c.close();
@@ -297,12 +330,46 @@ public class dbDriver {
 
             cv.put("user", sc.getUser());
             cv.put("email", sc.getEmail());
-            cv.put("lastMessagePreview", sc.getLastMessagePreview());
             cv.put("newMessages", sc.getNewMessages());
-            cv.put("lastMessageTime", sc.getLastMessageTime());
+            cv.put("lastMessagePreview", sc.getLastMessagePreview());
+            cv.put("lastMessageTS", sc.getLastMessageTime());
 
             if (dbWritable.insert("CHATS", null, cv) == -1)
                 System.err.println("Error adding chat to database");
+        }
+    }
+
+    public void updateChats(ArrayList<SingleChat> newChats){
+        res[0] = true;
+        dbThread.setUncaughtExceptionHandler(handler);
+        dbThread = new Thread(new updateChatsRunnable(newChats));
+        dbThread.start();
+    }
+
+    private class updateChatsRunnable implements Runnable{
+
+        ArrayList<SingleChat> newChats;
+
+        public updateChatsRunnable(ArrayList<SingleChat> newChats){
+            this.newChats=newChats;
+        }
+
+        @Override
+        public void run() {
+
+            for (SingleChat chat : newChats) {
+                ContentValues cv = new ContentValues();
+
+                cv.put("newMessages", chat.getNewMessages());
+                cv.put("lastMessagePreview", chat.getLastMessagePreview());
+                cv.put("lastMessageTS", chat.getLastMessageTime());
+                String condition="email=?";
+                String[] arg=new String[]{chat.getEmail()};
+
+                if(dbWritable.update("CHATS", cv, condition, arg)==-1){
+                    System.err.println("Error updating chats");
+                }
+            }
         }
     }
 

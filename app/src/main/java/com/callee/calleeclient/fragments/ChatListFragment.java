@@ -55,6 +55,8 @@ public class ChatListFragment extends ListFragment {
     public void onStart() {
         super.onStart();
         getListView().setOnItemClickListener((av, v, pos, index) -> {
+
+            chats.get((int)index).setNewMessages(0);
             Intent intent = new Intent(getActivity(), ChatActivity.class);
             Bundle b = new Bundle();
             b.putParcelable("chat", chats.get((int) index));
@@ -65,11 +67,13 @@ public class ChatListFragment extends ListFragment {
     }
 
     public void updateData(ArrayList<SingleChat> newChats) {
-        chats.addAll(newChats);
+
+        chats=new ArrayList<>(newChats);
 
         Collections.sort(chats);
 
-        for (SingleChat sc : newChats) {
+        data.clear();
+        for (SingleChat sc : chats) {
             HashMap<String, String> map = new HashMap<>();
             map.put("user", sc.getUser());
             map.put("newMessages", String.valueOf(sc.getNewMessages()));
@@ -78,7 +82,7 @@ public class ChatListFragment extends ListFragment {
             data.add(map);
         }
 
-        Collections.sort(data, (o1, o2) -> o1.get("lastMessageHour").compareTo(o2.get("lastMessageHour")));
+        Collections.sort(data, (o1, o2) -> o2.get("lastMessageHour").compareTo(o1.get("lastMessageHour")));
 
         adapter.notifyDataSetChanged();
     }

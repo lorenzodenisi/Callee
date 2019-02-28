@@ -25,6 +25,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -37,7 +38,9 @@ public class UpdateThread extends Thread {
     private ArrayList<Message> messages;
     private Message updateMessage;
     private Long lastUpdatedTime;
-    private ArrayList<String> chatEmails;
+    HashMap<String, SingleChat> chats;
+
+
 
 
     public UpdateThread(Context context, dbDriver localDB, int updateRate, Long lastUpdate) {
@@ -50,18 +53,11 @@ public class UpdateThread extends Thread {
 
         this.messages = new ArrayList<>();
 
-        ArrayList<SingleChat> chats = new ArrayList<>();   //get current chats
-        chatEmails = new ArrayList<>();
-        this.localDB.getChats(chats);
-        this.localDB.joinDbThread();
-        for (SingleChat sc : chats) {
-            this.chatEmails.add(sc.getEmail());
-        }
+        chats = new HashMap<>();   //get current chats
 
         this.updateMessage = new Message(-1L, Global.username, "SERVER",
                 Global.email, "server@server.server", System.currentTimeMillis(), ToM.UPDATEREQUEST);
         this.updateMessage.addLastUpdated(this.lastUpdatedTime);
-
     }
 
     @Override
@@ -71,8 +67,10 @@ public class UpdateThread extends Thread {
             InetAddress addr = InetAddress.getByName(Global.SERVERHOST);
 
             while (true) {
-
+                System.out.println("THREAD LOLLO" + Thread.currentThread().getId());
                 try {
+                    this.localDB.getChats(chats);
+                    this.localDB.joinDbThread();
 
                     Socket socket = new Socket(addr.getHostAddress(), Global.PORT);
 
@@ -100,12 +98,9 @@ public class UpdateThread extends Thread {
 
                     //assuming that messages are sorted
 
-
                     out.close();
                     socket.close();
 
-
-                    ArrayList<SingleChat> newChats = new ArrayList<>();
                     for (Message m : messages) {
 
                         Contact user;
@@ -116,13 +111,19 @@ public class UpdateThread extends Thread {
                         }
 
                         //check if relative chat is present
-                        if (!this.chatEmails.contains(user.getEmail())) {
-                            chatEmails.add(user.getEmail());
+                        if (!this.chats.containsKey(user.getEmail())) {
                             SingleChat newSC = new SingleChat(user.getName(), user.getEmail(),
-                                    "", 0, 0L);
+                                    m.getText(), 1, Long.parseLong(m.getTimestamp()));
+                            chats.put(newSC.getEmail(), newSC);
                             this.localDB.putChat(newSC);
-                            newChats.add(newSC);
                             this.localDB.joinDbThread();
+                        }else {                                                             //new chats could be modified here if there are more than one message
+                            SingleChat SC = chats.get(user.getEmail());
+                            if(m.getFromEmail().equals(user.getEmail())){   //if is received
+                                SC.setNewMessages(SC.getNewMessages()+1);
+                            }
+                            SC.setLastMessagePreview(m.getText());
+                            SC.setLastMessageTime(Long.parseLong(m.getTimestamp()));
                         }
 
                         this.localDB.putMessage(m);
@@ -130,10 +131,12 @@ public class UpdateThread extends Thread {
                     }
 
                     if (!messages.isEmpty()) {
+                        this.localDB.updateChats(new ArrayList<>(chats.values()));      //update all chats
+                        this.localDB.joinDbThread();
                         Intent broadcastIntent = new Intent();
                         broadcastIntent.setAction("com.callee.calleeclient.Broadcast");
                         broadcastIntent.putExtra("messages", messages);
-                        broadcastIntent.putExtra("chats", newChats);
+                        broadcastIntent.putExtra("chats", new ArrayList<>(chats.values()));
                         context.sendBroadcast(broadcastIntent);
                     }
 
