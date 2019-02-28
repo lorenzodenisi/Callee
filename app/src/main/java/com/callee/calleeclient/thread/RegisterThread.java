@@ -3,6 +3,7 @@ package com.callee.calleeclient.thread;
 import com.callee.calleeclient.Global;
 import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.ToM;
+import com.callee.calleeclient.database.dbDriver;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -108,9 +109,10 @@ public class RegisterThread extends Thread {
                 }else break;
             }
 
-            Global.db.setCredentials(response.getToName(), response.getToEmail(), null);
-            out1.write(1);
-
+            dbDriver.setCredentialsThread t = Global.db.setCredentials(response.getToName(), response.getToEmail(), null);
+            if(t._join()) {
+                out1.write(1);
+            }
             outW.close();
             socket.close();
         } catch (IOException | JSONException e) {

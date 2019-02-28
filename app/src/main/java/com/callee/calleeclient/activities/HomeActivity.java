@@ -63,7 +63,6 @@ public class HomeActivity extends AppCompatActivity {
             Global.db = new dbDriver();
         }
         Global.db.openConnection(this);
-        Global.db.joinDbThread();
 
         fetchCredentials();
         if(!isThreadRunning && (updateService==null || !updateService.isAlive())) {
@@ -131,25 +130,36 @@ public class HomeActivity extends AppCompatActivity {
 
     private void fetchInformations() {
         this.chats = new LinkedHashMap<>();
-        Global.db.getChats(chats);
-        Global.db.joinDbThread();
+        Thread t1 = Global.db.getChats(chats);
+        try {
+            t1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         this.contacts = new ArrayList<>();
-        Global.db.getContacts(contacts);
-        Global.db.joinDbThread();
+        Thread t2 = Global.db.getContacts(contacts);
+        try {
+            t2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void fetchCredentials() {
 
         Contact c = new Contact(null, null, null);
-        Global.db.getCredentials(c);
-
-        if (!Global.db.joinDbThread()) {
-            return;
+        Thread t = Global.db.getCredentials(c);
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
-        Global.username = c.getName();
-        Global.email = c.getEmail();
+        if(c!=null && c.getName()!=null && c.getEmail()!=null) {
+            Global.username = c.getName();
+            Global.email = c.getEmail();
+        }
     }
 
     public class HomeBReceiver extends BroadcastReceiver {
@@ -275,8 +285,8 @@ public class HomeActivity extends AppCompatActivity {
                         Toast.makeText(v.getContext(), email + " is not associated with an account", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(v.getContext(), email + " added with username " + c.getName(), Toast.LENGTH_LONG).show();
-                        Global.db.putContact(c);
-                        Global.db.joinDbThread();
+                        dbDriver.putContactThread t = Global.db.putContact(c);
+                        t._join();
                         popup.dismiss();
                         mAdapter.updateContacts(c);
                     }
@@ -299,8 +309,12 @@ public class HomeActivity extends AppCompatActivity {
 
             this.context = c;
             contacts = new ArrayList<>();
-            Global.db.getContacts(contacts);
-            Global.db.joinDbThread();
+            Thread t = Global.db.getContacts(contacts);
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             popupLayout = getLayoutInflater().inflate(R.layout.new_message_popup, null);
             popup = new PopupWindow(popupLayout, ViewGroup.LayoutParams.MATCH_PARENT,
@@ -358,10 +372,11 @@ public class HomeActivity extends AppCompatActivity {
             if (ch.getEmail().equals(c.getEmail()))
                 chat = ch;
         }
+        dbDriver.putChatThread t=null;
         if (chat == null) {     //new chat
             chat = new SingleChat(c.getName(), c.getEmail(), "", 0, 0L);
             chats.put(chat.getEmail(),chat);
-            Global.db.putChat(chat);
+           t= Global.db.putChat(chat);
         }
 
         Intent intent = new Intent(a, ChatActivity.class);
@@ -369,7 +384,7 @@ public class HomeActivity extends AppCompatActivity {
         b.putParcelable("chat", chat);
         intent.putExtra("data", b);
 
-        if (Global.db.joinDbThread()) {
+        if (t != null && t._join()) {
             startActivity(intent);
         }
     }

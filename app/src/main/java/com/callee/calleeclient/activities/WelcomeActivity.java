@@ -55,8 +55,14 @@ public class WelcomeActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
 
         Contact credentials = new Contact(null, null, null);
-        Global.db.getCredentials(credentials);
-        Global.db.joinDbThread();
+
+        Thread t = Global.db.getCredentials(credentials);
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         if (credentials.getEmail() == null || credentials.getName() == null) {
 
             FragmentManager fm = this.getSupportFragmentManager();

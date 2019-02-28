@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 
 import com.callee.calleeclient.Global;
 import com.callee.calleeclient.client.Message;
@@ -13,13 +12,11 @@ import com.callee.calleeclient.client.ToM;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class dbDriver {
 
     private dbHelper dbHelper = null;
     private SQLiteDatabase dbReadable = null, dbWritable = null;
-    private Thread dbThread;
     private boolean[] res = {true};
     private ExceptionHandler handler = new ExceptionHandler(res);
 
@@ -34,17 +31,18 @@ public class dbDriver {
         return dbWritable != null && dbReadable != null;
     }
 
-    public void putMessage(Message m) {
-        dbThread = new Thread(new putMessageRunnable(m));
-        res[0] = true;
+    public putMessageThread putMessage(Message m) {
+        putMessageThread dbThread = new putMessageThread(m);
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
+        return dbThread;
     }
 
-    private class putMessageRunnable implements Runnable {
+    public class putMessageThread extends Thread {
         Message m;
+        boolean res=true;
 
-        putMessageRunnable(Message m) {
+        putMessageThread(Message m) {
             this.m = m;
         }
 
@@ -61,26 +59,36 @@ public class dbDriver {
             cv.put("text", m.getText());
             if (dbWritable.insert("MESSAGES", null, cv) == -1) {
                 System.err.println("Error inserting message to database");
-                throw new SQLiteException();
+                res=false;
             }
         }
+
+        public boolean _join(){
+            try {
+                this.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return res;
+        }
+
     }
 
-    public void getMessages(List<Message> messages, Contact c) {
+    public Thread getMessages(ArrayList<Message> messages, Contact c) {
 
-        res[0] = true;
-        dbThread = new Thread(new getMessagesRunnable(messages, c));
+        getMessagesThread dbThread = new getMessagesThread(messages, c);
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
+        return dbThread;
     }
 
-    private class getMessagesRunnable implements Runnable {
+    private class getMessagesThread extends Thread {
 
-        List[] messages = new ArrayList[1];
+        ArrayList<Message> messages;
         Contact c;
 
-        getMessagesRunnable(List<Message> messages, Contact c) {
-            this.messages[0] = messages;
+        getMessagesThread(ArrayList<Message> messages, Contact c) {
+            this.messages = messages;
             this.c = c;
         }
 
@@ -107,25 +115,37 @@ public class dbDriver {
                 Message m = new Message(id, fromName, toName, fromEmail, toEmail, timestamp, ToM.MESSAGE);
                 m.putText(text);
 
-                messages[0].add(m);
+                messages.add(m);
             }
             cursor.close();
         }
+
+        public ArrayList<Message> _join(){
+            try {
+                this.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return messages;
+        }
+
     }
 
-    public void confirmRead(String email, Long timestamp){
-        res[0]=true;
-        dbThread= new Thread(new confirmReadRunnable(email, timestamp));
+    public confirmReadThread confirmRead(String email, Long timestamp){
+        confirmReadThread dbThread= new confirmReadThread(email, timestamp);
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
+        return dbThread;
     }
 
-    private class confirmReadRunnable implements Runnable{
+    public class confirmReadThread extends Thread{
 
+        boolean res = true;
         String email;
         Long timestamp;
 
-        public confirmReadRunnable(String email, Long timestamp){
+        public confirmReadThread(String email, Long timestamp){
             this.email=email;
             this.timestamp=timestamp;
         }
@@ -138,26 +158,35 @@ public class dbDriver {
 
             if(dbWritable.update("MESSAGES", cv, condition, new String[]{email, Global.email, timestamp.toString()})==-1){
                 System.err.println("Error updating message to database");
-                throw new SQLiteException();
+                res=false;
             }
         }
 
+        public boolean _join(){
+            try {
+                this.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return res;
+        }
     }
 
-    public void setCredentials(String user, String email, String number) {
+    public setCredentialsThread setCredentials(String user, String email, String number) {
 
-        res[0] = true;
-        dbThread = new Thread(new setCredentialsRunnable(user, email, number));
+        setCredentialsThread dbThread = new setCredentialsThread(user, email, number);
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
+        return dbThread;
     }
 
-    private class setCredentialsRunnable implements Runnable {
+    public class setCredentialsThread extends Thread {
 
+        boolean res = true;
         String user, email, number;
 
 
-        setCredentialsRunnable(String user, String email, String number) {
+        setCredentialsThread(String user, String email, String number) {
             this.user = user;
             this.email = email;
             this.number = number;
@@ -175,24 +204,33 @@ public class dbDriver {
 
             if (dbWritable.insert("CREDENTIALS", null, cv) == -1) {
                 System.out.println("Error setting credentials");
-                throw new SQLiteException();
+                res=false;
             }
+        }
+
+        public boolean _join(){
+            try {
+                this.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return res;
         }
     }
 
-    public void getCredentials(Contact credentials) {
-        res[0] = true;
-        dbThread = new Thread(new getCredentialsRunnable(credentials));
+    public Thread getCredentials(Contact credentials) {
+        getCredentialsThread dbThread = new getCredentialsThread(credentials);
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
+        return dbThread;
     }
 
-    private class getCredentialsRunnable implements Runnable {
+    private class getCredentialsThread extends Thread {
 
-        Contact[] credentials = new Contact[1];
+        Contact credentials;
 
-        getCredentialsRunnable(Contact credentials) {
-            this.credentials[0] = credentials;
+        getCredentialsThread(Contact credentials) {
+            this.credentials = credentials;
         }
 
         @Override
@@ -204,25 +242,27 @@ public class dbDriver {
                 user = c.getString(c.getColumnIndexOrThrow("username"));
                 email = c.getString(c.getColumnIndexOrThrow("email"));
                 number = c.getString(c.getColumnIndexOrThrow("number"));
-                credentials[0].setName(user);
-                credentials[0].setEmail(email);
-                credentials[0].setNumber(number);
+                credentials.setName(user);
+                credentials.setEmail(email);
+                credentials.setNumber(number);
             }
             c.close();
         }
     }
 
-    public void putContact(Contact c) {
-        res[0] = true;
+    public putContactThread putContact(Contact c) {
+
+        putContactThread dbThread = new putContactThread(c);
         dbThread.setUncaughtExceptionHandler(handler);
-        dbThread = new Thread(new putContactRunnable(c));
         dbThread.start();
+        return dbThread;
     }
 
-    private class putContactRunnable implements Runnable {
+    public class putContactThread extends Thread {
+        boolean res=true;
         Contact c;
 
-        putContactRunnable(Contact c) {
+        putContactThread(Contact c) {
             this.c = c;
         }
 
@@ -234,23 +274,34 @@ public class dbDriver {
             cv.put("email", c.getEmail());
             cv.put("number", c.getNumber());
 
-            if (dbWritable.insert("CONTACTS", null, cv) == -1)
+            if (dbWritable.insert("CONTACTS", null, cv) == -1) {
                 System.err.println("Error adding contact to database");
+                res=false;
+            }
+        }
+
+        public boolean _join(){
+            try {
+                this.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return res;
         }
     }
 
-    public void getContacts(ArrayList<Contact> contacts) {
-        res[0] = true;
-        dbThread = new Thread(new getContactsRunnable(contacts));
+    public Thread getContacts(ArrayList<Contact> contacts) {
+        getContactsThread dbThread = new getContactsThread(contacts);
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
+        return dbThread;
     }
 
-    private class getContactsRunnable implements Runnable {
-        ArrayList[] contacts = new ArrayList[1];
+    private class getContactsThread extends Thread {
+        ArrayList<Contact> contacts;
 
-        getContactsRunnable(ArrayList<Contact> contacts) {
-            this.contacts[0] = contacts;
+        getContactsThread(ArrayList<Contact> contacts) {
+            this.contacts = contacts;
         }
 
         @Override
@@ -265,26 +316,27 @@ public class dbDriver {
                 email = c.getString(c.getColumnIndexOrThrow("email"));
                 number = c.getString(c.getColumnIndexOrThrow("number"));
 
-                contacts[0].add(new Contact(user, email, number));
+                contacts.add(new Contact(user, email, number));
             }
 
             c.close();
         }
     }
 
-    public void getChats(HashMap<String, SingleChat> chats) {
-        res[0] = true;
-        dbThread = new Thread(new getChatsRunnable(chats));
+    public Thread getChats(HashMap<String, SingleChat> chats) {
+
+        getChatsThread dbThread = new getChatsThread(chats);
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
+        return dbThread;
     }
 
-    private class getChatsRunnable implements Runnable {
+    private class getChatsThread extends Thread {
 
-        HashMap[] chats = new HashMap[1];
+        HashMap<String, SingleChat> chats;
 
-        getChatsRunnable(HashMap<String, SingleChat> chats) {
-            this.chats[0] = chats;
+        getChatsThread(HashMap<String, SingleChat> chats) {
+            this.chats = chats;
         }
 
         @Override
@@ -303,24 +355,25 @@ public class dbDriver {
                 lastMessagePreview=c.getString(c.getColumnIndexOrThrow("lastMessagePreview"));
                 lastMessageTS=c.getLong(c.getColumnIndexOrThrow("lastMessageTS"));
 
-                chats[0].put(email, new SingleChat(user, email, lastMessagePreview, newMessages, lastMessageTS));
+                chats.put(email, new SingleChat(user, email, lastMessagePreview, newMessages, lastMessageTS));
             }
 
             c.close();
         }
     }
 
-    public void putChat(SingleChat sc) {
-        res[0] = true;
+    public putChatThread putChat(SingleChat sc) {
+        putChatThread dbThread = new putChatThread(sc);
         dbThread.setUncaughtExceptionHandler(handler);
-        dbThread = new Thread(new putChatRunnable(sc));
         dbThread.start();
+        return dbThread;
     }
 
-    private class putChatRunnable implements Runnable {
+    public class putChatThread extends Thread {
         SingleChat sc;
+        boolean res = true;
 
-        putChatRunnable(SingleChat sc) {
+        putChatThread(SingleChat sc) {
             this.sc = sc;
         }
 
@@ -334,23 +387,35 @@ public class dbDriver {
             cv.put("lastMessagePreview", sc.getLastMessagePreview());
             cv.put("lastMessageTS", sc.getLastMessageTime());
 
-            if (dbWritable.insert("CHATS", null, cv) == -1)
+            if (dbWritable.insert("CHATS", null, cv) == -1){
                 System.err.println("Error adding chat to database");
+            res = false;
+         }
+        }
+
+        public boolean _join(){
+            try {
+                this.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return res;
         }
     }
 
-    public void updateChats(ArrayList<SingleChat> newChats){
-        res[0] = true;
+    public updateChatsThread updateChats(ArrayList<SingleChat> newChats){
+        updateChatsThread dbThread = new updateChatsThread(newChats);
         dbThread.setUncaughtExceptionHandler(handler);
-        dbThread = new Thread(new updateChatsRunnable(newChats));
         dbThread.start();
+        return dbThread;
     }
 
-    private class updateChatsRunnable implements Runnable{
+    public class updateChatsThread extends Thread{
 
         ArrayList<SingleChat> newChats;
+        boolean res=true;
 
-        public updateChatsRunnable(ArrayList<SingleChat> newChats){
+        public updateChatsThread(ArrayList<SingleChat> newChats){
             this.newChats=newChats;
         }
 
@@ -368,8 +433,18 @@ public class dbDriver {
 
                 if(dbWritable.update("CHATS", cv, condition, arg)==-1){
                     System.err.println("Error updating chats");
+                    this.res=false;
                 }
             }
+        }
+
+        public boolean _join(){
+            try {
+                this.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return res;
         }
     }
 
@@ -388,18 +463,6 @@ public class dbDriver {
 
     public void closeConnection() {
         this.dbHelper.close();
-    }
-
-    public boolean joinDbThread() {
-        if (dbThread != null) {
-            try {
-                dbThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return res[0];
-        }
-        return false;
     }
 
     private class ExceptionHandler implements Thread.UncaughtExceptionHandler {

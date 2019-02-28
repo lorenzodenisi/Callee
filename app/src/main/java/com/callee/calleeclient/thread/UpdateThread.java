@@ -69,8 +69,8 @@ public class UpdateThread extends Thread {
             while (true) {
                 System.out.println("THREAD LOLLO" + Thread.currentThread().getId());
                 try {
-                    this.localDB.getChats(chats);
-                    this.localDB.joinDbThread();
+                    Thread t = this.localDB.getChats(chats);
+                    t.join();
 
                     Socket socket = new Socket(addr.getHostAddress(), Global.PORT);
 
@@ -115,8 +115,8 @@ public class UpdateThread extends Thread {
                             SingleChat newSC = new SingleChat(user.getName(), user.getEmail(),
                                     m.getText(), 1, Long.parseLong(m.getTimestamp()));
                             chats.put(newSC.getEmail(), newSC);
-                            this.localDB.putChat(newSC);
-                            this.localDB.joinDbThread();
+                            this.localDB.putChat(newSC)._join();
+
                         }else {                                                             //new chats could be modified here if there are more than one message
                             SingleChat SC = chats.get(user.getEmail());
                             if(m.getFromEmail().equals(user.getEmail())){   //if is received
@@ -126,13 +126,12 @@ public class UpdateThread extends Thread {
                             SC.setLastMessageTime(Long.parseLong(m.getTimestamp()));
                         }
 
-                        this.localDB.putMessage(m);
-                        this.localDB.joinDbThread();
+                        dbDriver.putMessageThread t2 = this.localDB.putMessage(m);
+                        t2._join();
                     }
 
                     if (!messages.isEmpty()) {
-                        this.localDB.updateChats(new ArrayList<>(chats.values()));      //update all chats
-                        this.localDB.joinDbThread();
+                        this.localDB.updateChats(new ArrayList<>(chats.values()))._join();      //update all chats
                         Intent broadcastIntent = new Intent();
                         broadcastIntent.setAction("com.callee.calleeclient.Broadcast");
                         broadcastIntent.putExtra("messages", messages);

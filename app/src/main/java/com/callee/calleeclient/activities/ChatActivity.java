@@ -64,8 +64,9 @@ public class ChatActivity extends AppCompatActivity {
         chatData = b.getParcelable("chat");
 
         //start retrieving messages
+        Thread getMessageThread=null;
         if (chatData != null) {
-            Global.db.getMessages(messages, new Contact(chatData.getUser(), chatData.getEmail(), null));
+            getMessageThread=Global.db.getMessages(messages, new Contact(chatData.getUser(), chatData.getEmail(), null));
         }
 
         //toolbar used just for back button
@@ -83,8 +84,12 @@ public class ChatActivity extends AppCompatActivity {
         FragmentManager fm = getSupportFragmentManager();
 
         //wait retrieving thread for messages
-        if (!Global.db.joinDbThread()) {
-            System.out.println("Error retrieving messages");
+        if(getMessageThread!=null) {
+            try {
+                getMessageThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         if(chatData.getNewMessages()>0)
@@ -118,8 +123,8 @@ public class ChatActivity extends AppCompatActivity {
     public void onPause(){
         ArrayList<SingleChat> updt = new ArrayList<>();
         updt.add(chatData);
-        Global.db.updateChats(updt);
-        if(! Global.db.joinDbThread()){
+        dbDriver.updateChatsThread t = Global.db.updateChats(updt);
+        if(! t._join()){
             System.err.println("Error updating chat");
         }
         this.unregisterReceiver(broadcastReceiver);

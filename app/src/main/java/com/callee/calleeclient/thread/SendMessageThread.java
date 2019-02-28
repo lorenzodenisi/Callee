@@ -54,8 +54,8 @@ public class SendMessageThread extends Thread {
                 if (response.getType() == ToM.MESSAGERESPONSE) {
                     sendMessage.setId(response.getId());
 
-                    localDB.putMessage(sendMessage);
-                    if (!localDB.joinDbThread()) {
+                    dbDriver.putMessageThread t = localDB.putMessage(sendMessage);
+                    if (!t._join()) {
                         System.out.println("Error saving message to local database");
                         return;
                     }

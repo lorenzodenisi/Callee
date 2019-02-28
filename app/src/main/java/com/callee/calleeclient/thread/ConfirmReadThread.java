@@ -2,6 +2,7 @@ package com.callee.calleeclient.thread;
 
 import com.callee.calleeclient.Global;
 import com.callee.calleeclient.client.Message;
+import com.callee.calleeclient.database.dbDriver;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,10 +47,8 @@ public class ConfirmReadThread extends Thread {
                 }else res=false;
             }
 
-            Global.db.confirmRead(message.getText(), Long.parseLong(message.getTimestamp()));
-            if(Global.db.joinDbThread()){
-                res=true;
-            }else res=false;
+            dbDriver.confirmReadThread t = Global.db.confirmRead(message.getText(), Long.parseLong(message.getTimestamp()));
+            res = t._join();
 
         }catch (IOException | JSONException e){
             e.printStackTrace();
