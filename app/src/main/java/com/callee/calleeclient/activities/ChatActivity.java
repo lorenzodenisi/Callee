@@ -23,6 +23,7 @@ import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.client.ToM;
 import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.database.dbDriver;
+import com.callee.calleeclient.fragments.ChatListFragment;
 import com.callee.calleeclient.fragments.MessageListFragment;
 import com.callee.calleeclient.thread.ConfirmReadThread;
 import com.callee.calleeclient.thread.SendMessageThread;
@@ -97,7 +98,7 @@ public class ChatActivity extends AppCompatActivity {
 
         //setting bradcast receiver
         if (broadcastReceiver == null || !isRegistered) {
-            broadcastReceiver = new ChatBReceiver();
+            broadcastReceiver = new ChatBReceiver(messages, msgListFragment, chatData);
             this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
             isRegistered = true;
         }
@@ -236,10 +237,22 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    public class ChatBReceiver extends BroadcastReceiver {
+    public static class ChatBReceiver extends BroadcastReceiver {
 
-        public ChatBReceiver() {
+        private final ArrayList<Message> messages;
+        private MessageListFragment msgListFragment;
+        private SingleChat chatData;
+
+        public ChatBReceiver(){
             super();
+            messages=null;
+        }
+
+        public ChatBReceiver(final ArrayList<Message> messages, MessageListFragment msgListFragment, SingleChat chatData) {
+            super();
+            this.messages=messages;
+            this.msgListFragment=msgListFragment;
+            this.chatData=chatData;
         }
 
         @Override

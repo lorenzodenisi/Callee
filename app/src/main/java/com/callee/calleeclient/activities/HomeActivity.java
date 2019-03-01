@@ -73,10 +73,6 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onStart() {
 
-        //setting bradcast receiver
-        broadcastReceiver = new HomeBReceiver();
-        this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
-
         fetchInformations();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -91,6 +87,10 @@ public class HomeActivity extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(mViewPager);
         mViewPager.setCurrentItem(1);     //default tab
+
+        //setting bradcast receiver
+        broadcastReceiver = new HomeBReceiver(chats, mAdapter);
+        this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
 
         super.onStart();
         //TODO add custom width to tabs (maybe icons) extension needed
@@ -154,7 +154,19 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    public class HomeBReceiver extends BroadcastReceiver {
+    public static class HomeBReceiver extends BroadcastReceiver {
+        LinkedHashMap<String, SingleChat> chats;
+        PagerAdapter mAdapter;
+
+        public HomeBReceiver(){
+            super();
+        }
+
+        public HomeBReceiver(LinkedHashMap<String, SingleChat> chats, PagerAdapter mAdapter){
+            super();
+            this.mAdapter=mAdapter;
+            this.chats=chats;
+        }
 
         @Override
         public void onReceive(Context context, Intent intent) {
