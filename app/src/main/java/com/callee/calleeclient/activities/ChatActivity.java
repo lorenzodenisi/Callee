@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
@@ -16,7 +15,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.callee.calleeclient.Global;
 import com.callee.calleeclient.R;
@@ -41,7 +39,7 @@ public class ChatActivity extends AppCompatActivity {
     private final ArrayList<Message> messages = new ArrayList<>();       //synchronized
     private MessageListFragment msgListFragment;
     private ChatBReceiver broadcastReceiver;
-    public static boolean isRegistered=false;
+    public static boolean isRegistered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,20 +96,30 @@ public class ChatActivity extends AppCompatActivity {
 
 
         //setting bradcast receiver
-        if(broadcastReceiver==null || !isRegistered) {
+        if (broadcastReceiver == null || !isRegistered) {
             broadcastReceiver = new ChatBReceiver();
             this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
-            isRegistered=true;
+            isRegistered = true;
         }
 
         //to detect keyboard open|close
-        final View activityRootView = findViewById(R.id.message_box_container);
-        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
-            if (heightDiff > 100) {
-                msgListFragment.goDown();
+        final View activityRootView = findViewById(R.id.chat_container);
+        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            boolean flag = false;
+
+            @Override
+            public void onGlobalLayout() {
+                int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
+                if (heightDiff > 500) {
+                    if (!flag) {
+                        msgListFragment.goDown();
+                        flag = true;
+                    }
+                } else flag = false;
             }
         });
+
     }
 
     @Override
@@ -123,7 +131,7 @@ public class ChatActivity extends AppCompatActivity {
     //Every time I go back to home activity or simpy exit application, save chat preview status
     @Override
     public void onPause() {
-        if(!messages.isEmpty()) {
+        if (!messages.isEmpty()) {
             chatData.setLastMessagePreview(messages.get(messages.size() - 1).getText());
             chatData.setLastMessageTime(Long.parseLong(messages.get(messages.size() - 1).getTimestamp()));
             ArrayList<SingleChat> updt = new ArrayList<>();
@@ -133,9 +141,9 @@ public class ChatActivity extends AppCompatActivity {
                 System.err.println("Error updating chat");
             }
         }
-        if(broadcastReceiver!=null && isRegistered) {
+        if (broadcastReceiver != null && isRegistered) {
             this.unregisterReceiver(broadcastReceiver);
-            isRegistered=false;
+            isRegistered = false;
         }
         super.onPause();
     }
