@@ -25,7 +25,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -38,10 +41,7 @@ public class UpdateThread extends Thread {
     private ArrayList<Message> messages;
     private Message updateMessage;
     private Long lastUpdatedTime;
-    HashMap<String, SingleChat> chats;
-
-
-
+    private HashMap<String, SingleChat> chats;
 
     public UpdateThread(Context context, dbDriver localDB, int updateRate, Long lastUpdate) {
         super();
@@ -50,13 +50,11 @@ public class UpdateThread extends Thread {
         this.localDB = localDB;
         this.updateRate = updateRate;
         this.lastUpdatedTime = lastUpdate;
-
         this.messages = new ArrayList<>();
-
         chats = new HashMap<>();   //get current chats
 
         this.updateMessage = new Message(-1L, Global.username, "SERVER",
-                Global.email, "server@server.server", System.currentTimeMillis(), ToM.UPDATEREQUEST);
+                Global.email, Global.SERVERMAIL, System.currentTimeMillis(), ToM.UPDATEREQUEST);
         this.updateMessage.addLastUpdated(this.lastUpdatedTime);
     }
 
@@ -88,8 +86,7 @@ public class UpdateThread extends Thread {
                             Update update = new Update(a);
                             messages.clear();
                             messages.addAll(update.getMessages());
-                            if (!messages.isEmpty())
-                                this.lastUpdatedTime = Long.parseLong(messages.get(messages.size() - 1).getTimestamp());
+
 
                         } catch (JSONException e) {
                             e.printStackTrace();    //ignore message
@@ -103,6 +100,11 @@ public class UpdateThread extends Thread {
 
                     for (Message m : messages) {
 
+                        if(Long.parseLong(m.getTimestamp())>this.lastUpdatedTime){
+                            lastUpdatedTime=Long.parseLong(m.getTimestamp());
+                        }
+
+                        //get the other user of message
                         Contact user;
                         if (m.getFromEmail().equals(Global.email)) {
                             user = new Contact(m.getToName(), m.getToEmail(), null);
@@ -117,12 +119,12 @@ public class UpdateThread extends Thread {
                             chats.put(newSC.getEmail(), newSC);
                             this.localDB.putChat(newSC)._join();
 
-                        }else {                                                             //new chats could be modified here if there are more than one message
+                        } else {                                            //new chats could be modified here if there are more than one message
                             SingleChat SC = chats.get(user.getEmail());
-                            if(m.getFromEmail().equals(user.getEmail())){   //if is received
-                                SC.setNewMessages(SC.getNewMessages()+1);
+                            if (m.getFromEmail().equals(user.getEmail())) {   //if is received
+                                SC.setNewMessages(Objects.requireNonNull(SC).getNewMessages() + 1);
                             }
-                            SC.setLastMessagePreview(m.getText());
+                            Objects.requireNonNull(SC).setLastMessagePreview(m.getText());
                             SC.setLastMessageTime(Long.parseLong(m.getTimestamp()));
                         }
 
@@ -131,6 +133,9 @@ public class UpdateThread extends Thread {
                     }
 
                     if (!messages.isEmpty()) {
+
+                        Collections.sort(messages, (a,b)-> a.getTimestamp().compareTo(b.getTimestamp()));
+
                         this.localDB.updateChats(new ArrayList<>(chats.values()))._join();      //update all chats
                         Intent broadcastIntent = new Intent();
                         broadcastIntent.setAction("com.callee.calleeclient.Broadcast");

@@ -21,11 +21,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ConfirmReadThread extends Thread {
 
-    Message message;
-    boolean res=true;
+    private Message message;
+    private boolean res = true;
 
     public ConfirmReadThread(Message m) {
-        this.message=m;
+        this.message = m;
     }
 
     @Override
@@ -42,21 +42,19 @@ public class ConfirmReadThread extends Thread {
             String content = bufferedReader.readLine();
             if (content != null) {
                 Message response = new Message(new JSONObject(content));
-                if(response.getText().equals("OK")){
-                    res=true;
-                }else res=false;
+                res = response.getText().equals("OK");
             }
 
             dbDriver.confirmReadThread t = Global.db.confirmRead(message.getText(), Long.parseLong(message.getTimestamp()));
             res = t._join();
 
-        }catch (IOException | JSONException e){
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
-            res=false;
+            res = false;
         }
     }
 
-    public boolean _join(){
+    public boolean _join() {
         try {
             this.join();
         } catch (InterruptedException e) {

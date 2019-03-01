@@ -50,18 +50,14 @@ public class WelcomeActivity extends AppCompatActivity {
         }
         Global.db.openConnection(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
 
         Contact credentials = new Contact(null, null, null);
 
         Thread t = Global.db.getCredentials(credentials);
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Global.db.join(t);
 
         if (credentials.getEmail() == null || credentials.getName() == null) {
 
@@ -81,36 +77,26 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putBoolean("auth", auth);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
 
         LinearLayout doneButton = this.findViewById(R.id.login_button);
         if (loginFragment != null && loginFragment.getView() != null)
             doneButton.setOnClickListener(new DoneListener(loginFragment.getView()));
-
     }
 
     private class DoneListener implements View.OnClickListener {
 
         private Pattern userPattern, mailPattern;
         private EditText username, mail, mail_confirm;
-        private View view;
 
         DoneListener(View view) {
             this.userPattern = Pattern.compile(".*[:;\\\\@()'\"].*");
-            this.mailPattern = Pattern.compile("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
+            this.mailPattern = Pattern.compile(getString(R.string.email_regex));
             username = view.findViewById(R.id.username_editText);
             mail = view.findViewById(R.id.email_editText);
             mail_confirm = view.findViewById(R.id.email_repeat_editText);
-            this.view = view;
         }
-
 
         public void onClick(View v) {
             String user = username.getText().toString();
@@ -131,7 +117,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     mail.setBackgroundTintList(getResources().getColorStateList(android.R.color.holo_red_dark));
                 }
                 mail.setText("");
-                mail.setHint("Wrong emailField address");
+                mail.setHint("Wrong email address");
                 mail.setHintTextColor(getResources().getColorStateList(android.R.color.holo_red_light));
             }
 
@@ -147,15 +133,16 @@ public class WelcomeActivity extends AppCompatActivity {
 
             if (!userPattern.matcher(user).matches() && mailPattern.matcher(email).matches() && email.equals(email_confirm)) {
                 Message m = new Message(-1L, user, "SERVER", email,
-                        "server@server.server", currentTimeMillis(), ToM.REGISTERUSER);
+                        Global.SERVERMAIL, currentTimeMillis(), ToM.REGISTERUSER);
 
-                //thread read from 2 and write on 1
                 if (rt != null) {
-                    rt.customJoin();
+                    rt._join();
                 }
                 rt = new RegisterThread(m);
                 rt.start();
 
+                //PIPES:
+                //thread read from 2 and write on 1
                 //main read from 1 and write on 2
                 int res = 0;
                 //wait thread to complete register first message
@@ -166,7 +153,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
                 if (res != 1) {
                     Toast.makeText(v.getContext(), "Email already taken", Toast.LENGTH_LONG).show();
-                    rt.customJoin();
+                    rt._join();
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         mail_confirm.setBackgroundTintList(getResources().getColorStateList(android.R.color.holo_red_dark));
@@ -189,7 +176,6 @@ public class WelcomeActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             return inflater.inflate(R.layout.login_fragment, container, false);
         }
-
     }
 
     public static class AuthFragment extends Fragment {
@@ -214,7 +200,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 authButton.setOnClickListener(new ConfirmListener(Objects.requireNonNull(getView()), WelcomeActivity.rt));
             }
         }
-
 
         private class ConfirmListener implements View.OnClickListener {
 
@@ -244,16 +229,17 @@ public class WelcomeActivity extends AppCompatActivity {
                     Intent intent = new Intent(getActivity(), HomeActivity.class);
                     startActivity(intent);
                 }
-                if (res == 0){
+                if (res == 0) {
                     codeField.setText("");
                     codeField.setHint("Wrong code!");
                 }
-                if(res==2){
+                if (res == 2) {
                     WelcomeActivity parent = (WelcomeActivity) getActivity();
-                    parent.loginFragment=new LoginFragment();
-                    getFragmentManager().beginTransaction()
-                            .replace(R.id.welcome_activity_container, parent.loginFragment , "login fragment").commit();
-
+                    if (parent != null && getFragmentManager() != null) {
+                        parent.loginFragment = new LoginFragment();
+                        getFragmentManager().beginTransaction()
+                                .replace(R.id.welcome_activity_container, parent.loginFragment, "login fragment").commit();
+                    }
                 }
             }
         }

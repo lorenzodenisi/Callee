@@ -2,6 +2,7 @@ package com.callee.calleeclient.client;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +31,7 @@ public class Message implements Parcelable {
 
     public Message(JSONObject source) throws JSONException {
 
-        this((Long) source.getLong("id"), (String) source.get("fromName"), (String) source.get("toName"),
+        this(source.getLong("id"), (String) source.get("fromName"), (String) source.get("toName"),
                 (String) source.get("fromEmail"), (String) source.get("toEmail"),
                 (Long) source.get("timestamp"), getType((String) source.get("type")));
 
@@ -69,16 +70,16 @@ public class Message implements Parcelable {
         return this.content.toString();
     }
 
+    @NonNull
+    @Override
     public String toString() {
-        String str = ("ID: " + this.getId().toString() + "\n" +
+        return ("ID: " + this.getId().toString() + "\n" +
                 "Type: " + this.getType().toString() + "\n" +
                 "From: " + this.getFromName() + " (" + this.getFromEmail() + ")\n" +
                 "To: " + this.getToName() + " (" + this.getToEmail() + ")\n" +
                 "Sent: " + this.getTimestamp()) + "\n" +
-                "Text: " + this.getText()+"\n" +
+                "Text: " + this.getText() + "\n" +
                 "Read: " + this.getRead();
-
-        return str;
     }
 
     public JSONObject getContent() {
@@ -245,15 +246,15 @@ public class Message implements Parcelable {
         return Message.getFormattedTime(Long.valueOf(this.getTimestamp()));
     }
 
-    public void setRead(boolean value){
-        try{
+    public void setRead(boolean value) {
+        try {
             this.content.put("read", value);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean getRead(){
+    public boolean getRead() {
         if (this.content.has("read")) {
             try {
                 return (boolean) this.content.get("read");
@@ -288,7 +289,8 @@ public class Message implements Parcelable {
             case "CONFIRMREAD":
                 return ToM.CONFIRMREAD;
 
-            default:return null;
+            default:
+                return null;
         }
     }
 

@@ -64,24 +64,21 @@ public class RegisterThread extends Thread {
                 return;
             }
 
-            /*while(in1.available()>0)
-                in2.read();*/
-
             out1.write(1);       //OK
 
             if (stopped) return;
 
             int i;
-            for(i=0; i<Global.MAXAUTHATTEMPT; i++) {
+            for (i = 0; i < Global.MAXAUTHATTEMPT; i++) {
 
                 byte[] codeByte = new byte[6];
                 in2.read(codeByte);
                 if (stopped) return;
                 int code;
 
-                try{
-                    code= Integer.parseInt(new String(codeByte));
-                }catch (NumberFormatException e){
+                try {
+                    code = Integer.parseInt(new String(codeByte));
+                } catch (NumberFormatException e) {
                     continue;
                 }
 
@@ -99,18 +96,17 @@ public class RegisterThread extends Thread {
                 obj = new JSONObject(content);
                 response = new Message(obj);
 
-
                 if (response.getType() != ToM.REGISTERCONFIRMRESPONSE || (!response.getText().equals("OK"))) {
-                    if(i==Global.MAXAUTHATTEMPT-1){
+                    if (i == Global.MAXAUTHATTEMPT - 1) {
                         out1.write(2);     //LAST ERROR
                         return;
                     }
                     out1.write(0);  //ERROR
-                }else break;
+                } else break;
             }
 
             dbDriver.setCredentialsThread t = Global.db.setCredentials(response.getToName(), response.getToEmail(), null);
-            if(t._join()) {
+            if (t._join()) {
                 out1.write(1);
             }
             outW.close();
@@ -120,10 +116,10 @@ public class RegisterThread extends Thread {
         }
     }
 
-    public void customJoin() {
-        this.stopped = true;
+    public void _join() {
+        this.stopped = true;    //setting flag to stop
         try {
-            out2.write('x');
+            out2.write('x');    //write something on pipe if it's stuck on it
         } catch (IOException e) {
             e.printStackTrace();
         }

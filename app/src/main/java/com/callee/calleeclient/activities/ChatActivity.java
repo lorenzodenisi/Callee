@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
@@ -12,8 +13,10 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.callee.calleeclient.Global;
 import com.callee.calleeclient.R;
@@ -26,20 +29,11 @@ import com.callee.calleeclient.fragments.MessageListFragment;
 import com.callee.calleeclient.thread.ConfirmReadThread;
 import com.callee.calleeclient.thread.SendMessageThread;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static java.lang.System.currentTimeMillis;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -47,6 +41,7 @@ public class ChatActivity extends AppCompatActivity {
     private final ArrayList<Message> messages = new ArrayList<>();       //synchronized
     private MessageListFragment msgListFragment;
     private ChatBReceiver broadcastReceiver;
+    public static boolean isRegistered=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +49,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.chat);
 
         //open database
-        if(Global.db==null) {
+        if (Global.db == null) {
             Global.db = new dbDriver();
         }
         Global.db.openConnection(this);
@@ -64,9 +59,9 @@ public class ChatActivity extends AppCompatActivity {
         chatData = b.getParcelable("chat");
 
         //start retrieving messages
-        Thread getMessageThread=null;
+        Thread getMessageThread = null;
         if (chatData != null) {
-            getMessageThread=Global.db.getMessages(messages, new Contact(chatData.getUser(), chatData.getEmail(), null));
+            getMessageThread = Global.db.getMessages(messages, new Contact(chatData.getUser(), chatData.getEmail(), null));
         }
 
         //toolbar used just for back button
@@ -84,20 +79,13 @@ public class ChatActivity extends AppCompatActivity {
         FragmentManager fm = getSupportFragmentManager();
 
         //wait retrieving thread for messages
-        if(getMessageThread!=null) {
-            try {
-                getMessageThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        Global.db.join(getMessageThread);
 
-        if(chatData.getNewMessages()>0)
+        if (chatData.getNewMessages() > 0)
             updateRead();
 
         b = new Bundle();
         b.putParcelableArrayList("messages", messages);
-        b.putString("user_email", chatData.getEmail());     //send also emailField of other user
         msgListFragment = new MessageListFragment();
         msgListFragment.setArguments(b);
         fm.beginTransaction().add(R.id.messagelist_container, msgListFragment, "messageList").commit();
@@ -108,55 +96,74 @@ public class ChatActivity extends AppCompatActivity {
         TextView tw = findViewById(R.id.message_box);
         tw.addTextChangedListener(new TextChecker(sendButton));
 
+
         //setting bradcast receiver
-        broadcastReceiver = new ChatBReceiver();
-        this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
+        if(broadcastReceiver==null || !isRegistered) {
+            broadcastReceiver = new ChatBReceiver();
+            this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
+            isRegistered=true;
+        }
+
+        //to detect keyboard open|close
+        final View activityRootView = findViewById(R.id.message_box_container);
+        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
+            if (heightDiff > 100) {
+                msgListFragment.goDown();
+            }
+        });
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        msgListFragment.goDown();
+        msgListFragment.goDown();           //scroll down fast
     }
 
+    //Every time I go back to home activity or simpy exit application, save chat preview status
     @Override
-    public void onPause(){
-        ArrayList<SingleChat> updt = new ArrayList<>();
-        updt.add(chatData);
-        dbDriver.updateChatsThread t = Global.db.updateChats(updt);
-        if(! t._join()){
-            System.err.println("Error updating chat");
+    public void onPause() {
+        if(!messages.isEmpty()) {
+            chatData.setLastMessagePreview(messages.get(messages.size() - 1).getText());
+            chatData.setLastMessageTime(Long.parseLong(messages.get(messages.size() - 1).getTimestamp()));
+            ArrayList<SingleChat> updt = new ArrayList<>();
+            updt.add(chatData);
+            dbDriver.updateChatsThread t = Global.db.updateChats(updt);
+            if (!t._join()) {
+                System.err.println("Error updating chat");
+            }
         }
-        this.unregisterReceiver(broadcastReceiver);
+        if(broadcastReceiver!=null && isRegistered) {
+            this.unregisterReceiver(broadcastReceiver);
+            isRegistered=false;
+        }
         super.onPause();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         NavUtils.navigateUpFromSameTask(this);      //emulate actionbar back button
     }
 
-
-    private boolean updateRead(){
-        for(Message m: messages){
-            if(!m.getRead()){
+    //If I'm in a chat, all messages have been read
+    //Update of read messages also on db
+    private boolean updateRead() {
+        for (Message m : messages) {
+            if (!m.getRead()) {
                 m.setRead(true);
             }
         }
         Message confirmMessage = new Message(-1L, Global.username, "SERVER", Global.email,
-                "server@server.server", System.currentTimeMillis(), ToM.CONFIRMREAD);
+                Global.SERVERMAIL, System.currentTimeMillis(), ToM.CONFIRMREAD);
         confirmMessage.putText(chatData.getEmail());
 
-        ConfirmReadThread confirm = new ConfirmReadThread(confirmMessage);
+        ConfirmReadThread confirm = new ConfirmReadThread(confirmMessage);      //TODO debug server (NOT FUNCTIONING)
         confirm.start();
         chatData.setNewMessages(0);
 
-        return confirm._join();
+        if (confirm._join())
+            return true;
+        else return false;
     }
 
     private class sendButtonOnClickListener implements View.OnClickListener {
@@ -173,14 +180,12 @@ public class ChatActivity extends AppCompatActivity {
                         Global.email, chatData.getEmail(), currentTimeMillis(), ToM.MESSAGE);
 
                 toSend.putText(content);
-
                 messages.add(toSend);
 
                 SendMessageThread sendThread = new SendMessageThread(Global.db, toSend, messages);
                 sendThread.start();
 
                 tw.setText("");
-
                 msgListFragment.addMessage(toSend);
                 msgListFragment.scrollDown();
 
@@ -231,7 +236,6 @@ public class ChatActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            //Toast.makeText(context, "New messages!", Toast.LENGTH_LONG).show();
             long lastReceived = Long.parseLong(messages.get(messages.size() - 1).getTimestamp());
 
             ArrayList<Message> newMessages = intent.getParcelableArrayListExtra("messages");
@@ -249,6 +253,8 @@ public class ChatActivity extends AppCompatActivity {
                             messages.add(m);
                             msgListFragment.addMessage(m);
                             msgListFragment.scrollDown();
+                            chatData.setLastMessagePreview(m.getText());
+                            chatData.setLastMessageTime(Long.parseLong(m.getTimestamp()));
                         }
                     }
                 }

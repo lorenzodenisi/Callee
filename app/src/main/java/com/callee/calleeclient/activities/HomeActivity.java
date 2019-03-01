@@ -1,6 +1,5 @@
 package com.callee.calleeclient.activities;
 
-import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -30,7 +29,6 @@ import android.widget.Toast;
 import com.callee.calleeclient.Global;
 import com.callee.calleeclient.PagerAdapter;
 import com.callee.calleeclient.R;
-import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.database.dbDriver;
@@ -52,7 +50,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private LinkedHashMap<String, SingleChat> chats;
     private ArrayList<Contact> contacts;
-    private static boolean isThreadRunning=false;
+    private static boolean isThreadRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,15 +63,15 @@ public class HomeActivity extends AppCompatActivity {
         Global.db.openConnection(this);
 
         fetchCredentials();
-        if(!isThreadRunning && (updateService==null || !updateService.isAlive())) {
+        if (!isThreadRunning && (updateService == null || !updateService.isAlive())) {
             updateService = new UpdateThread(this, Global.db, 5000, Global.db.getLastUpdate());
             updateService.start();
-            isThreadRunning=true;
+            isThreadRunning = true;
         }
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
 
         //setting bradcast receiver
         broadcastReceiver = new HomeBReceiver();
@@ -81,16 +79,16 @@ public class HomeActivity extends AppCompatActivity {
 
         fetchInformations();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mViewPager = (ViewPager) findViewById(R.id.mainPager);
-
+        //setting pager with tabs
+        mViewPager = findViewById(R.id.mainPager);
         mAdapter = new PagerAdapter(this.getSupportFragmentManager(), new ArrayList<>(this.chats.values()), this.contacts, this);
         mViewPager.addOnPageChangeListener(new PagerListener(this, mAdapter));
         mViewPager.setAdapter(mAdapter);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(mViewPager);
         mViewPager.setCurrentItem(1);     //default tab
 
@@ -112,23 +110,21 @@ public class HomeActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            return true;          //TODO settings
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         this.unregisterReceiver(broadcastReceiver);
         super.onPause();
     }
 
 
     private void fetchInformations() {
+
         this.chats = new LinkedHashMap<>();
         Thread t1 = Global.db.getChats(chats);
         try {
@@ -150,13 +146,9 @@ public class HomeActivity extends AppCompatActivity {
 
         Contact c = new Contact(null, null, null);
         Thread t = Global.db.getCredentials(c);
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Global.db.join(t);
 
-        if(c!=null && c.getName()!=null && c.getEmail()!=null) {
+        if (c.getName() != null && c.getEmail() != null) {
             Global.username = c.getName();
             Global.email = c.getEmail();
         }
@@ -164,19 +156,15 @@ public class HomeActivity extends AppCompatActivity {
 
     public class HomeBReceiver extends BroadcastReceiver {
 
-        public HomeBReceiver() {
-            super();
-        }
-
         @Override
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(context, "New messages!", Toast.LENGTH_LONG).show();
 
-            ArrayList<Message> ms = intent.getParcelableArrayListExtra("messages");
+            //ArrayList<Message> ms = intent.getParcelableArrayListExtra("messages");
             ArrayList<SingleChat> newChats = intent.getParcelableArrayListExtra("chats");
 
             chats.clear();
-            for (SingleChat c: newChats){
+            for (SingleChat c : newChats) {
                 chats.put(c.getEmail(), c);
             }
 
@@ -185,13 +173,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    public class PagerListener implements ViewPager.OnPageChangeListener {
+    private class PagerListener implements ViewPager.OnPageChangeListener {
 
         FloatingActionButton button;
         Activity activity;
         PagerAdapter adapter;
 
-        public PagerListener(Activity a, PagerAdapter p) {
+        PagerListener(Activity a, PagerAdapter p) {
             button = findViewById(R.id.new_button);
             this.activity = a;
             this.adapter = p;
@@ -199,7 +187,6 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         public void onPageScrolled(int i, float v, int i1) {
-
         }
 
         @Override
@@ -218,7 +205,7 @@ public class HomeActivity extends AppCompatActivity {
 
                 case 2:
                     button.show();
-                    button.setOnClickListener(new addContactListener(getApplicationContext()));
+                    button.setOnClickListener(new addContactListener());
                     break;
 
                 default:
@@ -228,7 +215,6 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         public void onPageScrollStateChanged(int i) {
-
         }
     }
 
@@ -238,11 +224,10 @@ public class HomeActivity extends AppCompatActivity {
         View popupLayout;
         Button confirmButton;
 
-        public addContactListener(Context context) {
+        addContactListener() {
             popupLayout = getLayoutInflater().inflate(R.layout.add_contact_popup, null);
             popup = new PopupWindow(popupLayout, ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT, true);
-
         }
 
         @Override
@@ -261,9 +246,9 @@ public class HomeActivity extends AppCompatActivity {
             String email;
             PopupWindow popup;
 
-            public ConfirmListener(View view, PopupWindow popup) {
+            ConfirmListener(View view, PopupWindow popup) {
                 this.emailField = view.findViewById(R.id.new_contact_field);
-                pattern = Pattern.compile("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
+                pattern = Pattern.compile(getString(R.string.email_regex));       //check email
                 this.popup = popup;
             }
 
@@ -280,8 +265,8 @@ public class HomeActivity extends AppCompatActivity {
                     addContactThread acT = new addContactThread(email);
                     acT.start();
                     Contact c = acT._join();
+                    emailField.setText("");
                     if (c == null) {
-                        emailField.setText("");
                         Toast.makeText(v.getContext(), email + " is not associated with an account", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(v.getContext(), email + " added with username " + c.getName(), Toast.LENGTH_LONG).show();
@@ -293,7 +278,6 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         }
-
     }
 
     private class newMessageListener implements View.OnClickListener {
@@ -304,17 +288,13 @@ public class HomeActivity extends AppCompatActivity {
         private ListView list;
         private Activity context;
 
-        public newMessageListener(Activity c) {
+        newMessageListener(Activity c) {
             super();
 
             this.context = c;
             contacts = new ArrayList<>();
             Thread t = Global.db.getContacts(contacts);
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Global.db.join(t);
 
             popupLayout = getLayoutInflater().inflate(R.layout.new_message_popup, null);
             popup = new PopupWindow(popupLayout, ViewGroup.LayoutParams.MATCH_PARENT,
@@ -326,7 +306,6 @@ public class HomeActivity extends AppCompatActivity {
             list = popupLayout.findViewById(R.id.new_message_contact_list);
 
             ArrayList<HashMap<String, String>> data = new ArrayList<>();
-
             for (Contact c : contacts) {
                 HashMap<String, String> map = new HashMap<>();
                 map.put("user", c.getName());
@@ -339,7 +318,7 @@ public class HomeActivity extends AppCompatActivity {
             if (contacts.isEmpty()) {
                 FrameLayout container = popupLayout.findViewById(R.id.new_message_contact_list_container);
                 TextView tip = new TextView(context);
-                tip.setText("Before messaging you need to add your friends to Contacts!");
+                tip.setText(getString(R.string.new_message_no_contact_tip));
                 tip.setGravity(Gravity.CENTER);
                 container.addView(tip);
                 list.setVisibility(View.INVISIBLE);
@@ -349,43 +328,41 @@ public class HomeActivity extends AppCompatActivity {
                 SimpleAdapter adapter = new SimpleAdapter(context, data, R.layout.contact, from, to);
 
                 list.setAdapter(adapter);
-
             }
 
             popup.setAnimationStyle(R.style.PopupAnimation);
             popup.showAtLocation(popupLayout, Gravity.CENTER, 0, 0);
 
-
             list.setOnItemClickListener((parent, view, position, id) -> {
-
                 goToChat(contacts.get(position), context);
                 popup.dismiss();
             });
         }
-    }
 
-    public void goToChat(Contact c, Activity a) {
+        private void goToChat(Contact c, Activity a) {
 
-        SingleChat chat = null;
+            SingleChat chat = null;
+            for (SingleChat ch : chats.values()) {
+                if (ch.getEmail().equals(c.getEmail())) {
+                    chat = ch;
+                    break;
+                }
+            }
+            dbDriver.putChatThread t = null;
+            if (chat == null) {     //new chat
+                chat = new SingleChat(c.getName(), c.getEmail(), "", 0, 0L);
+                chats.put(chat.getEmail(), chat);
+                t = Global.db.putChat(chat);
+            }
 
-        for (SingleChat ch : chats.values()) {
-            if (ch.getEmail().equals(c.getEmail()))
-                chat = ch;
-        }
-        dbDriver.putChatThread t=null;
-        if (chat == null) {     //new chat
-            chat = new SingleChat(c.getName(), c.getEmail(), "", 0, 0L);
-            chats.put(chat.getEmail(),chat);
-           t= Global.db.putChat(chat);
-        }
+            Intent intent = new Intent(a, ChatActivity.class);
+            Bundle b = new Bundle();
+            b.putParcelable("chat", chat);
+            intent.putExtra("data", b);
 
-        Intent intent = new Intent(a, ChatActivity.class);
-        Bundle b = new Bundle();
-        b.putParcelable("chat", chat);
-        intent.putExtra("data", b);
-
-        if (t != null && t._join()) {
-            startActivity(intent);
+            if (t == null || t._join()) {
+                startActivity(intent);
+            }
         }
     }
 }

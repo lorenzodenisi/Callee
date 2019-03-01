@@ -27,14 +27,14 @@ public class SendMessageThread extends Thread {
     private Message sendMessage;
     private final ArrayList<Message> messages;
 
-    public SendMessageThread(dbDriver localDB, Message m, ArrayList<Message> messages){
-        this.localDB=localDB;
-        this.sendMessage=m;
-        this.messages=messages;
+    public SendMessageThread(dbDriver localDB, Message m, ArrayList<Message> messages) {
+        this.localDB = localDB;
+        this.sendMessage = m;
+        this.messages = messages;
     }
 
     @Override
-    public void run(){
+    public void run() {
 
         try {
             InetAddress addr = InetAddress.getByName(Global.SERVERHOST);
@@ -66,7 +66,7 @@ public class SendMessageThread extends Thread {
 
                 }
             }
-        } catch (IOException | JSONException e){
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
     }

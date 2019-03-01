@@ -1,7 +1,6 @@
 package com.callee.calleeclient.database;
 
 class Query {
-
     static String SQL_CREATE_CREDENTIALS =
             "  CREATE TABLE IF NOT EXISTS CREDENTIALS(\n" +
                     "  username TEXT NOT NULL ,\n" +
@@ -19,10 +18,10 @@ class Query {
     static String SQL_CREATE_MESSAGES =
             "CREATE TABLE IF NOT EXISTS MESSAGES(\n" +
                     "  ID BIGINT UNSIGNED PRIMARY KEY NOT NULL ,\n" +
-                    "  fromName TEXT NOT NULL REFERENCES CONTACTS(username) ON UPDATE CASCADE ON DELETE NO ACTION ,\n" +
-                    "  toName TEXT NOT NULL REFERENCES CONTACTS(username) ON UPDATE CASCADE ON DELETE NO ACTION ,\n" +
-                    "  fromEmail TEXT NOT NULL REFERENCES CONTACTS(email) ON UPDATE NO ACTION ON DELETE NO ACTION ,\n" +
-                    "  toEmail TEXT NOT NULL REFERENCES CONTACTS(email) ON UPDATE NO ACTION ON DELETE NO ACTION,\n" +
+                    "  fromName TEXT NOT NULL ,\n" +
+                    "  toName TEXT NOT NULL ,\n" +
+                    "  fromEmail TEXT NOT NULL,\n" +
+                    "  toEmail TEXT NOT NULL,\n" +
                     "  timestamp BIGINT UNSIGNED NOT NULL,\n" +
                     "  text TEXT,\n" +
                     "  read INTEGER DEFAULT 0\n" +
@@ -30,8 +29,8 @@ class Query {
 
     static String SQL_CREATE_CHATS =
             "CREATE TABLE IF NOT EXISTS CHATS(\n" +
-                    "  user TEXT NOT NULL REFERENCES CONTACTS(username) ON UPDATE CASCADE ON DELETE NO ACTION ,\n" +
-                    "  email TEXT PRIMARY KEY NOT NULL REFERENCES CONTACTS(email) ON UPDATE CASCADE ON DELETE NO ACTION ,\n" +
+                    "  user TEXT NOT NULL ,\n" +
+                    "  email TEXT PRIMARY KEY NOT NULL ,\n" +
                     "  newMessages INTEGER NOT NULL, \n" +
                     "  lastMessagePreview TEXT, \n" +
                     "  lastMessageTS BIGINT UNSIGNED NOT NULL\n" +

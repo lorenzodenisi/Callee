@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_height="@dimen/single_chat_preview"
     android:layout_width="match_parent"
-    >
+    android:layout_height="@dimen/single_chat_preview">
 
 
     <ImageView
@@ -16,12 +14,11 @@
         app:srcCompat="@mipmap/ic_app" />
 
     <TableLayout
-        android:layout_weight="4"
-        android:stretchColumns="0"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="4"
         android:padding="@dimen/single_chat_universal_padding"
-        >
+        android:stretchColumns="0">
 
         <TableRow android:layout_weight="1">
 
@@ -38,25 +35,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="end|center"
-                android:textSize="@dimen/message_counter_font_size"
-                android:text="99"
                 android:paddingLeft="@dimen/single_chat_universal_padding"
-                android:paddingRight="@dimen/single_chat_universal_padding"/>
+                android:paddingRight="@dimen/single_chat_universal_padding"
+                android:text="99"
+                android:textSize="@dimen/message_counter_font_size" />
 
         </TableRow>
 
         <TableRow
             android:layout_weight="1"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/lastMessagePreview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="start|center"
                 android:paddingStart="@dimen/single_chat_universal_padding"
                 android:paddingEnd="@dimen/single_chat_universal_padding"
-                android:gravity="start|center"
                 android:text="@string/placeholder"
                 android:textSize="@dimen/msg_preview_font_size" />
 
@@ -65,10 +61,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="end|center"
-                android:text="00:00"
-                android:textSize="@dimen/msg_preview_font_size"
                 android:paddingLeft="@dimen/single_chat_universal_padding"
-                android:paddingRight="@dimen/single_chat_universal_padding"/>
+                android:paddingRight="@dimen/single_chat_universal_padding"
+                android:text="00:00"
+                android:textSize="@dimen/msg_preview_font_size" />
 
         </TableRow>
 

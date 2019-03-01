@@ -8,31 +8,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="30dp"
-        android:padding="10dp"
         android:background="@android:color/white"
         android:elevation="10dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="10dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="5dp"
             android:text="Select contact"
             android:textAlignment="center"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="20sp"
-            android:padding="5dp"/>
-<FrameLayout
-    android:id="@+id/new_message_contact_list_container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+            android:textSize="20sp" />
 
-    <ListView
-        android:id="@+id/new_message_contact_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
-</FrameLayout>
+        <FrameLayout
+            android:id="@+id/new_message_contact_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ListView
+                android:id="@+id/new_message_contact_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
 
     </LinearLayout>
 

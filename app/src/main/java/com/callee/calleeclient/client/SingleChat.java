@@ -2,6 +2,7 @@ package com.callee.calleeclient.client;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 public class SingleChat implements Parcelable, Comparable {
     private String user;
@@ -62,6 +63,7 @@ public class SingleChat implements Parcelable, Comparable {
         this.email = email;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return this.user;

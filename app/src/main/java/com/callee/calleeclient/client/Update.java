@@ -1,5 +1,7 @@
 package com.callee.calleeclient.client;
 
+import com.callee.calleeclient.Global;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +14,7 @@ public class Update {
 
     public Update(String toName, String toEmail, Long timestamp) {
         Message header = new Message((long) -1, "SERVER", toName,
-                "server@server.server", toEmail, timestamp, ToM.UPDATERESPONSE);
+                Global.SERVERMAIL, toEmail, timestamp, ToM.UPDATERESPONSE);
 
         messages = new JSONArray();
         this.addMessage(header);

@@ -3,9 +3,6 @@ package com.callee.calleeclient.database;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Comparator;
-
-
 public class Contact implements Parcelable, Comparable {
 
     private String name;

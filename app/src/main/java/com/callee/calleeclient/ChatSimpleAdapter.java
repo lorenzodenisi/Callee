@@ -17,46 +17,44 @@ import java.util.Map;
 public class ChatSimpleAdapter extends SimpleAdapter {
 
     private ArrayList<Message> messages;
-    private String userEmail;
 
     private int messageBackMargin, messageFrontMargin, messageVerticalMargin;
 
-    public ChatSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to, ArrayList<Message> messages, String userEmail) {
+    public ChatSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to, ArrayList<Message> messages) {
         super(context, data, resource, from, to);
-        this.messages=messages;
-        this.userEmail=userEmail;
+        this.messages = messages;
 
-        this.messageBackMargin=(int)context.getResources().getDimension(R.dimen.message_back_margin);
-        this.messageFrontMargin=(int)context.getResources().getDimension(R.dimen.message_front_margin);
-        this.messageVerticalMargin=(int)context.getResources().getDimension(R.dimen.message_vertical_margin);
+        this.messageBackMargin = (int) context.getResources().getDimension(R.dimen.message_back_margin);
+        this.messageFrontMargin = (int) context.getResources().getDimension(R.dimen.message_front_margin);
+        this.messageVerticalMargin = (int) context.getResources().getDimension(R.dimen.message_vertical_margin);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        View v =  super.getView(position, convertView, parent);
+        View v = super.getView(position, convertView, parent);
 
         try {
             LinearLayout ll = v.findViewById(R.id.message_container);
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams
                     (FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-            lp.width= FrameLayout.LayoutParams.WRAP_CONTENT;
-            lp.height= FrameLayout.LayoutParams.WRAP_CONTENT;
-            lp.topMargin=this.messageVerticalMargin;
-            lp.bottomMargin=this.messageVerticalMargin;
+            lp.width = FrameLayout.LayoutParams.WRAP_CONTENT;
+            lp.height = FrameLayout.LayoutParams.WRAP_CONTENT;
+            lp.topMargin = this.messageVerticalMargin;
+            lp.bottomMargin = this.messageVerticalMargin;
 
-            if(isReceived(position)) {          //message received
+            if (isReceived(position)) {          //message received
                 lp.gravity = Gravity.START;
-                lp.leftMargin= this.messageBackMargin;
-                lp.rightMargin=this.messageFrontMargin;
-            }else {
+                lp.leftMargin = this.messageBackMargin;
+                lp.rightMargin = this.messageFrontMargin;
+            } else {
                 lp.gravity = Gravity.END;              //message sent
-                lp.leftMargin=this.messageFrontMargin;
-                lp.rightMargin= this.messageBackMargin;
+                lp.leftMargin = this.messageFrontMargin;
+                lp.rightMargin = this.messageBackMargin;
             }
 
             ll.setLayoutParams(lp);
-        }catch (ClassCastException e){
+        } catch (ClassCastException e) {
             e.printStackTrace();
         }
 
@@ -68,8 +66,8 @@ public class ChatSimpleAdapter extends SimpleAdapter {
         return super.getCount();
     }
 
-    private boolean isReceived(int i){
+    private boolean isReceived(int i) {
         Message m = messages.get(i);
-        return (this.userEmail.equals(m.getFromEmail()));
+        return (Global.email.equals(m.getToEmail()));
     }
 }

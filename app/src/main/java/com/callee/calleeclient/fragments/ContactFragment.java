@@ -1,6 +1,7 @@
 package com.callee.calleeclient.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
@@ -13,8 +14,10 @@ import com.callee.calleeclient.R;
 import com.callee.calleeclient.database.Contact;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Objects;
+
+import static java.util.Collections.sort;
 
 public class ContactFragment extends Fragment {
 
@@ -24,7 +27,7 @@ public class ContactFragment extends Fragment {
     FloatingActionButton newButton;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.contact_container, container, false);
     }
 
@@ -50,7 +53,6 @@ public class ContactFragment extends Fragment {
         if (newButton != null) {
             newButton.hide();
         }
-
     }
 
     public void removeUserInfo() {
@@ -66,7 +68,7 @@ public class ContactFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         list = new ContactListFragment();
         list.setArguments(getArguments());
         getChildFragmentManager().beginTransaction()
@@ -87,14 +89,13 @@ public class ContactFragment extends Fragment {
             if (bundle != null) {
                 contacts = bundle.getParcelableArrayList("contacts");       //getting data from Bundle
             }
-            data = new ArrayList<>();
 
+            data = new ArrayList<>();
             for (Contact c : contacts) {
                 HashMap<String, String> map = new HashMap<>();
                 map.put("user", c.getName());
                 map.put("email", c.getEmail());
                 map.put("number", c.getNumber());
-
                 data.add(map);
             }
 
@@ -111,17 +112,18 @@ public class ContactFragment extends Fragment {
             super.onStart();
             getListView().setOnItemClickListener((av, v, pos, index) -> {
                 Contact c = this.contacts.get(pos);
-                ((ContactFragment) getParentFragment()).showUserInfo(c);
+                if (getParentFragment() != null) {
+                    ((ContactFragment) getParentFragment()).showUserInfo(c);
+                }
             });
         }
-
 
         public void addContact(Contact c) {
             if (!contacts.contains(c)) {
                 contacts.add(c);
             }
 
-            Collections.sort(contacts);
+            sort(contacts);
 
 
             HashMap<String, String> map = new HashMap<>();
@@ -130,7 +132,8 @@ public class ContactFragment extends Fragment {
             map.put("number", c.getNumber());
 
             this.data.add(map);
-            Collections.sort(data, (o1, o2) -> o1.get("user").compareTo(o2.get("user")));
+            sort(data, (o1, o2) -> Objects.requireNonNull(o1.get("user"))
+                    .compareTo(Objects.requireNonNull(o2.get("user"))));
 
             adapter.notifyDataSetChanged();
         }

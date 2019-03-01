@@ -29,7 +29,7 @@ public class addContactThread extends Thread {
     public addContactThread(String email) {
         this.email = email;
         m = new Message(-1L, Global.username, "SERVER", Global.email,
-                "server@server.server", System.currentTimeMillis(), ToM.CONFIRMCONTACT);
+                Global.SERVERMAIL, System.currentTimeMillis(), ToM.CONFIRMCONTACT);
     }
 
     @Override

@@ -20,9 +20,6 @@ public class dbDriver {
     private boolean[] res = {true};
     private ExceptionHandler handler = new ExceptionHandler(res);
 
-    public dbDriver() {
-    }
-
     public boolean openConnection(Context context) {
         this.dbHelper = new dbHelper(context);
 
@@ -40,7 +37,7 @@ public class dbDriver {
 
     public class putMessageThread extends Thread {
         Message m;
-        boolean res=true;
+        boolean res = true;
 
         putMessageThread(Message m) {
             this.m = m;
@@ -59,11 +56,11 @@ public class dbDriver {
             cv.put("text", m.getText());
             if (dbWritable.insert("MESSAGES", null, cv) == -1) {
                 System.err.println("Error inserting message to database");
-                res=false;
+                res = false;
             }
         }
 
-        public boolean _join(){
+        public boolean _join() {
             try {
                 this.join();
             } catch (InterruptedException e) {
@@ -120,7 +117,7 @@ public class dbDriver {
             cursor.close();
         }
 
-        public ArrayList<Message> _join(){
+        public ArrayList<Message> _join() {
             try {
                 this.join();
             } catch (InterruptedException e) {
@@ -132,37 +129,37 @@ public class dbDriver {
 
     }
 
-    public confirmReadThread confirmRead(String email, Long timestamp){
-        confirmReadThread dbThread= new confirmReadThread(email, timestamp);
+    public confirmReadThread confirmRead(String email, Long timestamp) {
+        confirmReadThread dbThread = new confirmReadThread(email, timestamp);
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
         return dbThread;
     }
 
-    public class confirmReadThread extends Thread{
+    public class confirmReadThread extends Thread {
 
         boolean res = true;
         String email;
         Long timestamp;
 
-        public confirmReadThread(String email, Long timestamp){
-            this.email=email;
-            this.timestamp=timestamp;
+        confirmReadThread(String email, Long timestamp) {
+            this.email = email;
+            this.timestamp = timestamp;
         }
 
         @Override
-        public void run(){
-            ContentValues cv=new ContentValues();
+        public void run() {
+            ContentValues cv = new ContentValues();
             cv.put("read", "1");
             String condition = "fromEmail = ? AND toEmail= ? AND timestamp <= ?";
 
-            if(dbWritable.update("MESSAGES", cv, condition, new String[]{email, Global.email, timestamp.toString()})==-1){
+            if (dbWritable.update("MESSAGES", cv, condition, new String[]{email, Global.email, timestamp.toString()}) == -1) {
                 System.err.println("Error updating message to database");
-                res=false;
+                res = false;
             }
         }
 
-        public boolean _join(){
+        public boolean _join() {
             try {
                 this.join();
             } catch (InterruptedException e) {
@@ -204,11 +201,11 @@ public class dbDriver {
 
             if (dbWritable.insert("CREDENTIALS", null, cv) == -1) {
                 System.out.println("Error setting credentials");
-                res=false;
+                res = false;
             }
         }
 
-        public boolean _join(){
+        public boolean _join() {
             try {
                 this.join();
             } catch (InterruptedException e) {
@@ -259,7 +256,7 @@ public class dbDriver {
     }
 
     public class putContactThread extends Thread {
-        boolean res=true;
+        boolean res = true;
         Contact c;
 
         putContactThread(Contact c) {
@@ -276,11 +273,11 @@ public class dbDriver {
 
             if (dbWritable.insert("CONTACTS", null, cv) == -1) {
                 System.err.println("Error adding contact to database");
-                res=false;
+                res = false;
             }
         }
 
-        public boolean _join(){
+        public boolean _join() {
             try {
                 this.join();
             } catch (InterruptedException e) {
@@ -352,8 +349,8 @@ public class dbDriver {
                 user = c.getString(c.getColumnIndexOrThrow("user"));
                 email = c.getString(c.getColumnIndexOrThrow("email"));
                 newMessages = c.getInt(c.getColumnIndexOrThrow("newMessages"));
-                lastMessagePreview=c.getString(c.getColumnIndexOrThrow("lastMessagePreview"));
-                lastMessageTS=c.getLong(c.getColumnIndexOrThrow("lastMessageTS"));
+                lastMessagePreview = c.getString(c.getColumnIndexOrThrow("lastMessagePreview"));
+                lastMessageTS = c.getLong(c.getColumnIndexOrThrow("lastMessageTS"));
 
                 chats.put(email, new SingleChat(user, email, lastMessagePreview, newMessages, lastMessageTS));
             }
@@ -387,13 +384,13 @@ public class dbDriver {
             cv.put("lastMessagePreview", sc.getLastMessagePreview());
             cv.put("lastMessageTS", sc.getLastMessageTime());
 
-            if (dbWritable.insert("CHATS", null, cv) == -1){
+            if (dbWritable.insert("CHATS", null, cv) == -1) {
                 System.err.println("Error adding chat to database");
-            res = false;
-         }
+                res = false;
+            }
         }
 
-        public boolean _join(){
+        public boolean _join() {
             try {
                 this.join();
             } catch (InterruptedException e) {
@@ -403,20 +400,20 @@ public class dbDriver {
         }
     }
 
-    public updateChatsThread updateChats(ArrayList<SingleChat> newChats){
+    public updateChatsThread updateChats(ArrayList<SingleChat> newChats) {
         updateChatsThread dbThread = new updateChatsThread(newChats);
         dbThread.setUncaughtExceptionHandler(handler);
         dbThread.start();
         return dbThread;
     }
 
-    public class updateChatsThread extends Thread{
+    public class updateChatsThread extends Thread {
 
         ArrayList<SingleChat> newChats;
-        boolean res=true;
+        boolean res = true;
 
-        public updateChatsThread(ArrayList<SingleChat> newChats){
-            this.newChats=newChats;
+        updateChatsThread(ArrayList<SingleChat> newChats) {
+            this.newChats = newChats;
         }
 
         @Override
@@ -428,17 +425,17 @@ public class dbDriver {
                 cv.put("newMessages", chat.getNewMessages());
                 cv.put("lastMessagePreview", chat.getLastMessagePreview());
                 cv.put("lastMessageTS", chat.getLastMessageTime());
-                String condition="email=?";
-                String[] arg=new String[]{chat.getEmail()};
+                String condition = "email=?";
+                String[] arg = new String[]{chat.getEmail()};
 
-                if(dbWritable.update("CHATS", cv, condition, arg)==-1){
+                if (dbWritable.update("CHATS", cv, condition, arg) == -1) {
                     System.err.println("Error updating chats");
-                    this.res=false;
+                    this.res = false;
                 }
             }
         }
 
-        public boolean _join(){
+        public boolean _join() {
             try {
                 this.join();
             } catch (InterruptedException e) {
@@ -476,6 +473,16 @@ public class dbDriver {
         public void uncaughtException(Thread t, Throwable e) {
             System.out.println("UncaughtEx:" + e);
             res[0] = false;
+        }
+    }
+
+    //join wrapper to reduce code on other classes
+    public static void join(Thread t) {
+        if (t == null) return;
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

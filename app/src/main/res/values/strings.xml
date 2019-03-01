@@ -17,4 +17,6 @@
 
     <string name="auth_text1">Type here the code that has been sent to your email</string>
     <string name="auth_confirm">CONFIRM</string>
+    <string name="email_regex">^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$</string>
+    <string name="new_message_no_contact_tip">Before messaging you need to add your friends to Contacts!</string>
 </resources>

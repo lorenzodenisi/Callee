@@ -13,8 +13,10 @@ import com.callee.calleeclient.activities.ChatActivity;
 import com.callee.calleeclient.client.SingleChat;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Objects;
+
+import static java.util.Collections.sort;
 
 
 public class ChatListFragment extends ListFragment {
@@ -31,17 +33,20 @@ public class ChatListFragment extends ListFragment {
         }
 
         data = new ArrayList<>();
-
         for (SingleChat sc : chats) {
             HashMap<String, String> map = new HashMap<>();
             map.put("user", sc.getUser());
-            map.put("newMessages", String.valueOf(sc.getNewMessages()));
+
+            if (sc.getNewMessages() > 0)
+                map.put("newMessages", String.valueOf(sc.getNewMessages()));
+            else
+                map.put("newMessages", "");
+
             map.put("lastMessagePreview", sc.getLastMessagePreview());
             map.put("lastMessageHour", sc.getFormattedLastMessageTime());
 
             data.add(map);
         }
-
 
         String[] from = {"user", "newMessages", "lastMessagePreview", "lastMessageHour"};
         int[] to = {R.id.userNameTextBoxPreview, R.id.messageCounter, R.id.lastMessagePreview, R.id.lastMessageTime};
@@ -55,34 +60,37 @@ public class ChatListFragment extends ListFragment {
     public void onStart() {
         super.onStart();
         getListView().setOnItemClickListener((av, v, pos, index) -> {
-
-            chats.get((int)index).setNewMessages(0);
             Intent intent = new Intent(getActivity(), ChatActivity.class);
             Bundle b = new Bundle();
             b.putParcelable("chat", chats.get((int) index));
             intent.putExtra("data", b);
-
             startActivity(intent);
         });
     }
 
     public void updateData(ArrayList<SingleChat> newChats) {
 
-        chats=new ArrayList<>(newChats);
+        chats = new ArrayList<>(newChats);
 
-        Collections.sort(chats);
+        sort(chats);
 
         data.clear();
         for (SingleChat sc : chats) {
             HashMap<String, String> map = new HashMap<>();
             map.put("user", sc.getUser());
-            map.put("newMessages", String.valueOf(sc.getNewMessages()));
+
+            if (sc.getNewMessages() > 0)
+                map.put("newMessages", String.valueOf(sc.getNewMessages()));
+            else
+                map.put("newMessages", "");
+
             map.put("lastMessagePreview", sc.getLastMessagePreview());
             map.put("lastMessageHour", sc.getFormattedLastMessageTime());
             data.add(map);
         }
 
-        Collections.sort(data, (o1, o2) -> o2.get("lastMessageHour").compareTo(o1.get("lastMessageHour")));
+        sort(data, (o1, o2) -> Objects.requireNonNull(o2.get("lastMessageHour"))
+                .compareTo(Objects.requireNonNull(o1.get("lastMessageHour"))));
 
         adapter.notifyDataSetChanged();
     }

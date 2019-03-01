@@ -17,7 +17,6 @@ public class MessageListFragment extends ListFragment {
 
     private ArrayList<HashMap<String, String>> data;
     private ArrayList<Message> messages;
-    private String userEmail;
     ChatSimpleAdapter sa;
 
     @Override
@@ -26,7 +25,6 @@ public class MessageListFragment extends ListFragment {
 
         if (bundle != null) {
             messages = bundle.getParcelableArrayList("messages");
-            userEmail = bundle.getString("user_email");
         }
 
         data = new ArrayList<>();
@@ -40,7 +38,7 @@ public class MessageListFragment extends ListFragment {
 
         String[] from = {"text", "date"};
         int[] to = {R.id.message_text, R.id.message_date};
-        sa = new ChatSimpleAdapter(this.getContext(), data, R.layout.message, from, to, messages, userEmail);
+        sa = new ChatSimpleAdapter(this.getContext(), data, R.layout.message, from, to, messages);
         setListAdapter(sa);
 
         return super.onCreateView(inflater, container, savedInstanceState);

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,8 +15,7 @@
         android:text="@string/login_text1"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="14sp"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -141,36 +139,37 @@
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="end"
         android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="end"
+        android:orientation="horizontal"
         android:padding="20dp"
-        android:orientation="horizontal">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
         <TextView
             android:layout_width="0dp"
-            android:layout_weight="3"
             android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:background="@null"
+            android:includeFontPadding="false"
+            android:lines="1"
             android:padding="5dp"
             android:text="@string/login_done"
-            android:lines="1"
             android:textAlignment="gravity"
-            android:background="@null"
-            android:textSize="20sp"
             android:textColor="@color/colorPrimaryDark"
-            android:includeFontPadding="false"
-            />
+            android:textSize="20sp" />
+
         <FrameLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
-            >
+            android:layout_weight="1">
+
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                app:srcCompat="@drawable/ic_right_arrow"
-                android:contentDescription="right arrow"/>
+                android:contentDescription="right arrow"
+                app:srcCompat="@drawable/ic_right_arrow" />
         </FrameLayout>
     </LinearLayout>
 

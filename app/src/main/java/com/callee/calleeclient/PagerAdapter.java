@@ -1,7 +1,6 @@
 package com.callee.calleeclient;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -28,17 +27,17 @@ public class PagerAdapter extends FragmentPagerAdapter {
     private Contact newContact;
     private Activity parent;
 
-    public PagerAdapter(FragmentManager fm, List<SingleChat> chats, ArrayList<Contact> contacts, Activity parent){
+    public PagerAdapter(FragmentManager fm, List<SingleChat> chats, ArrayList<Contact> contacts, Activity parent) {
         super(fm);
-        this.chats=(ArrayList)chats;
-        this.contacts=contacts;
-        this.parent=parent;
+        this.chats = (ArrayList<SingleChat>) chats;
+        this.contacts = contacts;
+        this.parent = parent;
     }
 
     @Override
     public Fragment getItem(int i) {
 
-        switch (i){
+        switch (i) {
             case 0: {
                 uF = new UserInfoFragment();
                 Bundle b = new Bundle();
@@ -47,21 +46,22 @@ public class PagerAdapter extends FragmentPagerAdapter {
                 return uF;
             }
             case 1: {
-                Bundle b=new Bundle();
-                cF= new ChatListFragment();
+                Bundle b = new Bundle();
+                cF = new ChatListFragment();
                 b.putParcelableArrayList("chats", chats);
                 cF.setArguments(b);
                 return cF;
             }
-            case 2:{
+            case 2: {
                 Bundle b = new Bundle();
-                contactF=new ContactFragment();
+                contactF = new ContactFragment();
                 contactF.setNewButton(parent.findViewById(R.id.new_button));
                 b.putParcelableArrayList("contacts", contacts);
                 contactF.setArguments(b);
                 return contactF;
             }
-            default:return null;
+            default:
+                return null;
         }
     }
 
@@ -71,43 +71,46 @@ public class PagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public CharSequence getPageTitle(int position){
-        switch (position){
-            case 0: return"INFO";
-            case 1: return"CHAT";
-            case 2: return"CONTACTS";
-            default:return "";
+    public CharSequence getPageTitle(int position) {
+        switch (position) {
+            case 0:
+                return "INFO";
+            case 1:
+                return "CHAT";
+            case 2:
+                return "CONTACTS";
+            default:
+                return "";
         }
     }
 
-   public void updateChats(ArrayList<SingleChat> newChats){
-        this.newChats=newChats;
+    public void updateChats(ArrayList<SingleChat> newChats) {
+        this.newChats = newChats;
         this.notifyDataSetChanged();
     }
 
 
-   public void updateContacts(Contact newContact){
-        this.newContact=newContact;
+    public void updateContacts(Contact newContact) {
+        this.newContact = newContact;
         this.notifyDataSetChanged();
-   }
+    }
 
     @Override
-    public int getItemPosition(Object object){
-        if(object instanceof ChatListFragment && newChats!=null){
+    public int getItemPosition(Object object) {
+        if (object instanceof ChatListFragment && newChats != null) {
             ((ChatListFragment) object).updateData(newChats);
-            newChats=null;
+            newChats = null;
         }
 
-        if(object instanceof ContactFragment && newContact!=null){
-            ((ContactFragment)object).addContact(newContact);
-            newContact=null;
-
+        if (object instanceof ContactFragment && newContact != null) {
+            ((ContactFragment) object).addContact(newContact);
+            newContact = null;
         }
         return super.getItemPosition(object);
     }
 
-    public void removeContactInfo(){
-        if(contactF!=null)
+    public void removeContactInfo() {
+        if (contactF != null)
             this.contactF.removeUserInfo();
     }
 }
