@@ -47,6 +47,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat);
 
+
         //open database
         if (Global.db == null) {
             Global.db = new dbDriver();
@@ -61,7 +62,12 @@ public class ChatActivity extends AppCompatActivity {
         Thread getMessageThread = null;
         if (chatData != null) {
             getMessageThread = Global.db.getMessages(messages, new Contact(chatData.getUser(), chatData.getEmail(), null));
+
+            //reset notifications
+            Global.notifyManager.resetNotifications(chatData.getEmail());
+            Global.notifyManager.setCurrentChat(chatData.getEmail());
         }
+
 
         //toolbar used just for back button
         Toolbar toolbar = findViewById(R.id.chat_toolbar);

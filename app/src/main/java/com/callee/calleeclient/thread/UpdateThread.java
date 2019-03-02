@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.callee.calleeclient.Global;
+import com.callee.calleeclient.NotifyManager;
 import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.client.ToM;
@@ -56,6 +57,8 @@ public class UpdateThread extends Thread {
         this.updateMessage = new Message(-1L, Global.username, "SERVER",
                 Global.email, Global.SERVERMAIL, System.currentTimeMillis(), ToM.UPDATEREQUEST);
         this.updateMessage.addLastUpdated(this.lastUpdatedTime);
+
+        Global.notifyManager=new NotifyManager(context);
     }
 
     @Override
@@ -108,6 +111,7 @@ public class UpdateThread extends Thread {
                         Contact user;
                         if (m.getFromEmail().equals(Global.email)) {
                             user = new Contact(m.getToName(), m.getToEmail(), null);
+
                         } else {
                             user = new Contact(m.getFromName(), m.getFromEmail(), null);
                         }
@@ -135,6 +139,7 @@ public class UpdateThread extends Thread {
                     if (!messages.isEmpty()) {
 
                         Collections.sort(messages, (a,b)-> a.getTimestamp().compareTo(b.getTimestamp()));
+                        Global.notifyManager.notifyMessages(context, messages);
 
                         this.localDB.updateChats(new ArrayList<>(chats.values()))._join();      //update all chats
                         Intent broadcastIntent = new Intent();

@@ -12,4 +12,5 @@ public class Global {
     static public String username;
     static public String email;
     static public dbDriver db;
+    public static NotifyManager notifyManager;
 }

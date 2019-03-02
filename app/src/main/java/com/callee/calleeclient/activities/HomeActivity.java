@@ -73,6 +73,8 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onStart() {
 
+        Global.notifyManager.setCurrentChat(null);
+
         fetchInformations();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
