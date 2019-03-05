@@ -1,4 +1,4 @@
-package com.callee.calleeclient.thread;
+package com.callee.calleeclient.threads;
 
 import com.callee.calleeclient.Global;
 import com.callee.calleeclient.client.Message;

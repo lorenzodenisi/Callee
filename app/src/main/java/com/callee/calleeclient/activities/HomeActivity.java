@@ -1,6 +1,7 @@
 package com.callee.calleeclient.activities;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,13 +29,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.callee.calleeclient.Global;
+import com.callee.calleeclient.NotifyManager;
 import com.callee.calleeclient.PagerAdapter;
 import com.callee.calleeclient.R;
 import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.database.dbDriver;
-import com.callee.calleeclient.thread.UpdateThread;
-import com.callee.calleeclient.thread.addContactThread;
+import com.callee.calleeclient.services.UpdateService;
+import com.callee.calleeclient.threads.addContactThread;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,38 +44,48 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import static com.callee.calleeclient.Global.db;
+
 public class HomeActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
     private PagerAdapter mAdapter;
-    private UpdateThread updateService;
     private HomeBReceiver broadcastReceiver;
+    private Intent serviceIntent;
 
     private LinkedHashMap<String, SingleChat> chats;
     private ArrayList<Contact> contacts;
-    private static boolean isThreadRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        if (Global.db == null) {
-            Global.db = new dbDriver();
+        if (db == null) {
+            db = new dbDriver();
         }
-        Global.db.openConnection(this);
+        db.openConnection(this);
+
+        long dbLastUpdate=db.getLastUpdate();
+        if(dbLastUpdate>=Global.lastUpdate)
+            Global.lastUpdate=dbLastUpdate;
 
         fetchCredentials();
-        if (!isThreadRunning && (updateService == null || !updateService.isAlive())) {
-            updateService = new UpdateThread(this, Global.db, 5000, Global.db.getLastUpdate());
-            updateService.start();
-            isThreadRunning = true;
+
+        serviceIntent = new Intent(getApplicationContext(), UpdateService.class);
+        if (!Global.isUpdateServiceRunning) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent);
+            }else startService(serviceIntent);
         }
     }
 
     @Override
     public void onStart() {
 
+        if(Global.notifyManager==null){
+            Global.notifyManager=new NotifyManager(getApplicationContext());
+        }
         Global.notifyManager.setCurrentChat(null);
 
         fetchInformations();
@@ -124,11 +137,24 @@ public class HomeActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    @Override
+    public void onStop(){
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy(){
+
+        stopService(serviceIntent);
+
+        super.onDestroy();
+    }
+
 
     private void fetchInformations() {
 
         this.chats = new LinkedHashMap<>();
-        Thread t1 = Global.db.getChats(chats);
+        Thread t1 = db.getChats(chats);
         try {
             t1.join();
         } catch (InterruptedException e) {
@@ -136,7 +162,7 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         this.contacts = new ArrayList<>();
-        Thread t2 = Global.db.getContacts(contacts);
+        Thread t2 = db.getContacts(contacts);
         try {
             t2.join();
         } catch (InterruptedException e) {
@@ -147,8 +173,8 @@ public class HomeActivity extends AppCompatActivity {
     private void fetchCredentials() {
 
         Contact c = new Contact(null, null, null);
-        Thread t = Global.db.getCredentials(c);
-        Global.db.join(t);
+        Thread t = db.getCredentials(c);
+        db.join(t);
 
         if (c.getName() != null && c.getEmail() != null) {
             Global.username = c.getName();
@@ -284,7 +310,7 @@ public class HomeActivity extends AppCompatActivity {
                         Toast.makeText(v.getContext(), email + " is not associated with an account", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(v.getContext(), email + " added with username " + c.getName(), Toast.LENGTH_LONG).show();
-                        dbDriver.putContactThread t = Global.db.putContact(c);
+                        dbDriver.putContactThread t = db.putContact(c);
                         t._join();
                         popup.dismiss();
                         mAdapter.updateContacts(c);
@@ -307,8 +333,8 @@ public class HomeActivity extends AppCompatActivity {
 
             this.context = c;
             contacts = new ArrayList<>();
-            Thread t = Global.db.getContacts(contacts);
-            Global.db.join(t);
+            Thread t = db.getContacts(contacts);
+            db.join(t);
 
             popupLayout = getLayoutInflater().inflate(R.layout.new_message_popup, null);
             popup = new PopupWindow(popupLayout, ViewGroup.LayoutParams.MATCH_PARENT,
@@ -366,7 +392,7 @@ public class HomeActivity extends AppCompatActivity {
             if (chat == null) {     //new chat
                 chat = new SingleChat(c.getName(), c.getEmail(), "", 0, 0L);
                 chats.put(chat.getEmail(), chat);
-                t = Global.db.putChat(chat);
+                t = db.putChat(chat);
             }
 
             Intent intent = new Intent(a, ChatActivity.class);

@@ -1,4 +1,4 @@
-package com.callee.calleeclient.thread;
+package com.callee.calleeclient.threads;
 
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +27,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -43,10 +42,12 @@ public class UpdateThread extends Thread {
     private Message updateMessage;
     private Long lastUpdatedTime;
     private HashMap<String, SingleChat> chats;
+    public boolean running;
 
     public UpdateThread(Context context, dbDriver localDB, int updateRate, Long lastUpdate) {
         super();
 
+        this.running=true;
         this.context = context;
         this.localDB = localDB;
         this.updateRate = updateRate;
@@ -58,7 +59,8 @@ public class UpdateThread extends Thread {
                 Global.email, Global.SERVERMAIL, System.currentTimeMillis(), ToM.UPDATEREQUEST);
         this.updateMessage.addLastUpdated(this.lastUpdatedTime);
 
-        Global.notifyManager=new NotifyManager(context);
+        if(Global.notifyManager==null)
+            Global.notifyManager=new NotifyManager(context);
     }
 
     @Override
@@ -67,11 +69,14 @@ public class UpdateThread extends Thread {
         try {
             InetAddress addr = InetAddress.getByName(Global.SERVERHOST);
 
-            while (true) {
-                System.out.println("THREAD LOLLO" + Thread.currentThread().getId());
+            while (running) {
+                System.out.println("THREAD LOLLO" + Thread.currentThread().getId());    //debug
                 try {
-                    Thread t = this.localDB.getChats(chats);
-                    t.join();
+
+                    if(localDB!=null) {
+                        Thread t = this.localDB.getChats(chats);
+                        t.join();
+                    }
 
                     Socket socket = new Socket(addr.getHostAddress(), Global.PORT);
 
@@ -116,24 +121,26 @@ public class UpdateThread extends Thread {
                             user = new Contact(m.getFromName(), m.getFromEmail(), null);
                         }
 
-                        //check if relative chat is present
-                        if (!this.chats.containsKey(user.getEmail())) {
-                            SingleChat newSC = new SingleChat(user.getName(), user.getEmail(),
-                                    m.getText(), 1, Long.parseLong(m.getTimestamp()));
-                            chats.put(newSC.getEmail(), newSC);
-                            this.localDB.putChat(newSC)._join();
+                        //check if relative chat is present (only if app is running)
+                        if(localDB!=null && chats!=null) {
+                            if (!this.chats.containsKey(user.getEmail())) {
+                                SingleChat newSC = new SingleChat(user.getName(), user.getEmail(),
+                                        m.getText(), 1, Long.parseLong(m.getTimestamp()));
+                                chats.put(newSC.getEmail(), newSC);
+                                this.localDB.putChat(newSC)._join();
 
-                        } else {                                            //new chats could be modified here if there are more than one message
-                            SingleChat SC = chats.get(user.getEmail());
-                            if (m.getFromEmail().equals(user.getEmail())) {   //if is received
-                                SC.setNewMessages(Objects.requireNonNull(SC).getNewMessages() + 1);
+                            } else {                                            //new chats could be modified here if there are more than one message
+                                SingleChat SC = chats.get(user.getEmail());
+                                if (m.getFromEmail().equals(user.getEmail())) {   //if is received
+                                    SC.setNewMessages(Objects.requireNonNull(SC).getNewMessages() + 1);
+                                }
+                                Objects.requireNonNull(SC).setLastMessagePreview(m.getText());
+                                SC.setLastMessageTime(Long.parseLong(m.getTimestamp()));
                             }
-                            Objects.requireNonNull(SC).setLastMessagePreview(m.getText());
-                            SC.setLastMessageTime(Long.parseLong(m.getTimestamp()));
-                        }
 
-                        dbDriver.putMessageThread t2 = this.localDB.putMessage(m);
-                        t2._join();
+                            dbDriver.putMessageThread t2 = this.localDB.putMessage(m);
+                            t2._join();
+                        }
                     }
 
                     if (!messages.isEmpty()) {
@@ -141,12 +148,14 @@ public class UpdateThread extends Thread {
                         Collections.sort(messages, (a,b)-> a.getTimestamp().compareTo(b.getTimestamp()));
                         Global.notifyManager.notifyMessages(context, messages);
 
-                        this.localDB.updateChats(new ArrayList<>(chats.values()))._join();      //update all chats
-                        Intent broadcastIntent = new Intent();
-                        broadcastIntent.setAction("com.callee.calleeclient.Broadcast");
-                        broadcastIntent.putExtra("messages", messages);
-                        broadcastIntent.putExtra("chats", new ArrayList<>(chats.values()));
-                        context.sendBroadcast(broadcastIntent);
+                        if(localDB!=null) {
+                            this.localDB.updateChats(new ArrayList<>(chats.values()))._join();      //update all chats (only if app is running)
+                            Intent broadcastIntent = new Intent();
+                            broadcastIntent.setAction("com.callee.calleeclient.Broadcast");
+                            broadcastIntent.putExtra("messages", messages);
+                            broadcastIntent.putExtra("chats", new ArrayList<>(chats.values()));
+                            context.sendBroadcast(broadcastIntent);
+                        }
                     }
 
                 } catch (IOException e) {

@@ -31,18 +31,18 @@ public class NotifyManager {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Callee";
             String description = "CalleeNotificationManager";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
-            notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
 
-            builders = new HashMap<>();
-            ids = new HashMap<>();
-        }
 
+        }
+        builders = new HashMap<>();
+        ids = new HashMap<>();
     }
 
     public void notifyMessages(Context context, ArrayList<Message> upt) {

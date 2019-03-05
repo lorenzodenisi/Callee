@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.callee.calleeclient">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_app"
@@ -38,6 +40,30 @@
             android:parentActivityName="com.callee.calleeclient.activities.HomeActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
         />
+
+        <service android:name=".services.UpdateService"
+            android:exported="false"
+            android:enabled="true">
+        </service>
+
+        <receiver android:name=".services.UpdateService$RestarterBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:label="RestartServiceWhenStopped"
+            />
+
+        <receiver android:name=".services.UpdateService$StartOnBootReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:label="onBootStartService"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.REBOOT"/>
+            </intent-filter>
+        </receiver>
+
+
     </application>
 
 </manifest>

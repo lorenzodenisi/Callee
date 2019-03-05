@@ -23,10 +23,9 @@ import com.callee.calleeclient.client.SingleChat;
 import com.callee.calleeclient.client.ToM;
 import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.database.dbDriver;
-import com.callee.calleeclient.fragments.ChatListFragment;
 import com.callee.calleeclient.fragments.MessageListFragment;
-import com.callee.calleeclient.thread.ConfirmReadThread;
-import com.callee.calleeclient.thread.SendMessageThread;
+import com.callee.calleeclient.threads.ConfirmReadThread;
+import com.callee.calleeclient.threads.SendMessageThread;
 
 import java.util.ArrayList;
 import java.util.Objects;

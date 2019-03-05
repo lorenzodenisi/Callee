@@ -22,7 +22,7 @@ import com.callee.calleeclient.client.Message;
 import com.callee.calleeclient.client.ToM;
 import com.callee.calleeclient.database.Contact;
 import com.callee.calleeclient.database.dbDriver;
-import com.callee.calleeclient.thread.RegisterThread;
+import com.callee.calleeclient.threads.RegisterThread;
 
 import java.io.IOException;
 import java.util.Locale;
