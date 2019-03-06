@@ -52,6 +52,7 @@ public class HomeActivity extends AppCompatActivity {
     private PagerAdapter mAdapter;
     private HomeBReceiver broadcastReceiver;
     private Intent serviceIntent;
+    private boolean isRegistered=false;
 
     private LinkedHashMap<String, SingleChat> chats;
     private ArrayList<Contact> contacts;
@@ -106,6 +107,7 @@ public class HomeActivity extends AppCompatActivity {
         //setting bradcast receiver
         broadcastReceiver = new HomeBReceiver(chats, mAdapter);
         this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
+        isRegistered=true;
 
         super.onStart();
         //TODO add custom width to tabs (maybe icons) extension needed
@@ -133,7 +135,10 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onPause() {
-        this.unregisterReceiver(broadcastReceiver);
+        if(isRegistered) {
+            this.unregisterReceiver(broadcastReceiver);
+            isRegistered=false;
+        }
         super.onPause();
     }
 
@@ -170,7 +175,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void fetchCredentials() {
+    public static void fetchCredentials() {
 
         Contact c = new Contact(null, null, null);
         Thread t = db.getCredentials(c);

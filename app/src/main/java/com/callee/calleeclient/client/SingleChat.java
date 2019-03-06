@@ -48,7 +48,7 @@ public class SingleChat implements Parcelable, Comparable {
     }
 
     public String getFormattedLastMessageTime() {
-        return Message.getFormattedTime(lastMessageTime);
+        return Message.getFormattedChatTime(lastMessageTime);
     }
 
     public void setLastMessageTime(Long lastMessageTime) {

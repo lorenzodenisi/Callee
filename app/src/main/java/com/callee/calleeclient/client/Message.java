@@ -8,7 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Locale;
 
 public class Message implements Parcelable {
@@ -294,11 +294,33 @@ public class Message implements Parcelable {
         }
     }
 
-    static public String getFormattedTime(Long timestamp) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+    static public String getFormattedChatTime(Long timestamp) {
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int day = c.get(Calendar.DAY_OF_YEAR);
 
-        Date d = new Date(timestamp);
-        return format.format(d);
+        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        SimpleDateFormat hour = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
+
+        c.setTimeInMillis(timestamp);
+
+        if(year==c.get(Calendar.YEAR) && day==c.get(Calendar.DAY_OF_YEAR)) {    //today
+            return hour.format(c.getTime());
+        }
+
+        c.add(Calendar.DAY_OF_YEAR, 1);
+        if(c.get(Calendar.DAY_OF_YEAR)==day){       //yesterday
+            return "Yesterday";
+        }
+        else
+        return date.format(c.getTime());
+    }
+
+    static public String getFormattedTime(Long timestamp){
+        SimpleDateFormat hour = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timestamp);
+        return hour.format(c.getTime());
     }
 
     //code for make Message parselable

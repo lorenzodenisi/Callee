@@ -16,4 +16,5 @@ public class Global {
     public static NotifyManager notifyManager;
     public static Boolean isUpdateServiceRunning=false;
     public static Long lastUpdate=0L;
+
 }
