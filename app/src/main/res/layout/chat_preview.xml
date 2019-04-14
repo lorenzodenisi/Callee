@@ -24,18 +24,24 @@
 
             <TextView
                 android:id="@+id/userNameTextBoxPreview"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="6"
                 android:layout_height="match_parent"
+                android:ellipsize="end"
                 android:gravity="center|start"
+
+                android:singleLine="true"
                 android:text="@string/placeholder"
                 android:textSize="@dimen/username_font_size" />
 
             <TextView
                 android:id="@+id/messageCounter"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:gravity="end|center"
                 android:paddingLeft="@dimen/single_chat_universal_padding"
+
                 android:paddingRight="@dimen/single_chat_universal_padding"
                 android:text="99"
                 android:textSize="@dimen/message_counter_font_size" />
@@ -48,9 +54,12 @@
 
             <TextView
                 android:id="@+id/lastMessagePreview"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="5"
                 android:layout_height="match_parent"
+                android:ellipsize="end"
                 android:gravity="start|center"
+                android:maxLines="1"
                 android:paddingStart="@dimen/single_chat_universal_padding"
                 android:paddingEnd="@dimen/single_chat_universal_padding"
                 android:text="@string/placeholder"
@@ -58,13 +67,14 @@
 
             <TextView
                 android:id="@+id/lastMessageTime"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="2"
                 android:layout_height="match_parent"
                 android:gravity="end|center"
                 android:paddingLeft="@dimen/single_chat_universal_padding"
                 android:paddingRight="@dimen/single_chat_universal_padding"
                 android:text="00:00"
-                android:textSize="@dimen/msg_preview_font_size" />
+                android:textSize="@dimen/message_date_font_size" />
 
         </TableRow>
 

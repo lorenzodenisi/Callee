@@ -89,9 +89,6 @@ public class ChatListFragment extends ListFragment {
             data.add(map);
         }
 
-        sort(data, (o1, o2) -> Objects.requireNonNull(o2.get("lastMessageHour"))
-                .compareTo(Objects.requireNonNull(o1.get("lastMessageHour"))));
-
         adapter.notifyDataSetChanged();
     }
 }

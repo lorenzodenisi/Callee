@@ -68,10 +68,11 @@ public class NotifyManager {
             if (builder == null) {
                 builder = new CustomBuilder(context, this.CHANNEL_ID);
                 builder.setContentText("");
+                builder.setNumber(upt.size());
                 builder.setContentTitle(m.getFromName());
                 builder.setGroup(this.GROUPKEY);
                 builder.setColor(context.getResources().getColor(R.color.colorAccent));
-                builder.setSmallIcon(R.mipmap.ic_app);
+                builder.setSmallIcon(R.drawable.ic_notificationicon);
                 builders.put(m.getFromEmail(), builder);
                 ids.put(builder, ++lastId);
             }
@@ -84,7 +85,7 @@ public class NotifyManager {
         NotificationCompat.Builder summary = new NotificationCompat.Builder(context, CHANNEL_ID);
         summary.setContentTitle("Callee")
                 .setContentText("New Messages")
-                .setSmallIcon(R.mipmap.ic_app)
+                .setSmallIcon(R.drawable.ic_notificationicon)
                 .setGroupSummary(true)
                 .setGroup(GROUPKEY)
                 .setStyle(style)
@@ -103,7 +104,7 @@ public class NotifyManager {
                 continue;
 
             style.addLine(email);
-            style.setSummaryText("New Messages");
+            style.setSummaryText(upt.size()+" new messages");
 
             notificationManager.notify(ids.get(builder), builder.build());
             i++;
@@ -117,6 +118,7 @@ public class NotifyManager {
             cb.setContentIntent(PendingIntent.getActivity(context, 0, tapIntent,
                             PendingIntent.FLAG_UPDATE_CURRENT));
             cb.setAutoCancel(true);
+            cb.setColor(context.getResources().getColor(R.color.colorAccent));
             notificationManager.notify(ids.get(cb), cb.build());
             cb.setAutoCancel(false);
             cb.setContentIntent(null);

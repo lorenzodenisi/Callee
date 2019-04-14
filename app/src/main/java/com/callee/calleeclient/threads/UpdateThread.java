@@ -178,7 +178,7 @@ public class UpdateThread extends Thread {
         } catch (InterruptedException | UnknownHostException e) {
             //jump out of loop
             e.printStackTrace();
-            System.out.println("LOLLO: Error on update thread");
+            System.out.println("LOLLO: Error on update thread");    //debug
         }
     }
 }

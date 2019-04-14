@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 
 public class SingleChat implements Parcelable, Comparable {
     private String user;
-    private int newMessages;
+    private int newMessages = 0;
     private String lastMessagePreview;
     private Long lastMessageTime;
     private String email;
@@ -109,6 +109,15 @@ public class SingleChat implements Parcelable, Comparable {
     public int compareTo(Object o) {
         SingleChat s = (SingleChat) o;
 
-        return (int) (s.getLastMessageTime() - this.lastMessageTime);
+        Long t1, t2;
+        t1 = this.lastMessageTime;
+        t2 = s.getLastMessageTime();
+
+        if(t2-t1 > 0) return 1;
+        if(t2.equals(t1)) return 0;
+        if(t2-t1 < 0) return -1;
+
+        return 0;
+        //return (int) (s.getLastMessageTime() - this.lastMessageTime);
     }
 }

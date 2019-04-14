@@ -98,7 +98,7 @@ public class UpdateService extends Service {
                 HomeActivity.fetchCredentials();
 
                 Log.i(RestarterBroadcastReceiver.class.getSimpleName(), "Service Stops!");
-                System.out.println("LOLLO");
+                //System.out.println("LOLLO");    //debug
                 Intent i = new Intent(context, UpdateService.class);
                 i.putExtra("lastUpdate", lastUpdate);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
