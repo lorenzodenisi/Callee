@@ -32,6 +32,7 @@ public class MessageListFragment extends ListFragment {
             HashMap<String, String> map = new HashMap<>();
             map.put("text", m.getText());
             map.put("date", m.getDate());
+            map.put("to", m.getToEmail());      //just for positioning
 
             data.add(map);
         }
@@ -55,6 +56,7 @@ public class MessageListFragment extends ListFragment {
         HashMap<String, String> map = new HashMap<>();
         map.put("text", m.getText());
         map.put("date", m.getDate());
+        map.put("to", m.getToEmail());      //just for positioning
 
         this.data.add(map);
         sa.notifyDataSetChanged();

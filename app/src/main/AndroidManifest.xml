@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_app"
@@ -48,8 +50,10 @@
             android:enabled="true">
         </service>
 
-        <service android:name=".services.JIService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <!-- JobIntentService
+        <service android:name=".services.UpdateJobIntentService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/> -->
 
         <receiver android:name=".services.UpdateService$RestarterBroadcastReceiver"
             android:enabled="true"

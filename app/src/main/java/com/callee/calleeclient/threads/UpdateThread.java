@@ -54,7 +54,6 @@ public class UpdateThread extends Thread {
         chats = new HashMap<>();   //get current chats
 
 
-
         this.updateMessage = new Message(-1L, Global.username, "SERVER",
                 Global.email, Global.SERVERMAIL, System.currentTimeMillis(), ToM.UPDATEREQUEST);
         this.updateMessage.addLastUpdated(Global.lastUpdate);
@@ -74,7 +73,7 @@ public class UpdateThread extends Thread {
                 if(updateMessage.getFromEmail()==null)
                     continue;
 
-                System.out.println("THREAD LOLLO" + Thread.currentThread().getId());    //debug
+                System.out.println("CALLEE THREAD" + Thread.currentThread().getId());    //debug
                 try {
 
                     if(Global.db!=null) {
@@ -170,7 +169,7 @@ public class UpdateThread extends Thread {
                 } catch (IOException e) {
                     //ignored
                     e.printStackTrace();
-                    System.out.println("LOLLO: Error on update thread");
+                    System.out.println("CALLEE: Error on update thread");
                 }
 
                 Thread.sleep(updateRate);
@@ -178,7 +177,7 @@ public class UpdateThread extends Thread {
         } catch (InterruptedException | UnknownHostException e) {
             //jump out of loop
             e.printStackTrace();
-            System.out.println("LOLLO: Error on update thread");    //debug
+            System.out.println("CALLEE: Error on update thread");    //debug
         }
     }
 }

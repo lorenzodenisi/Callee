@@ -75,9 +75,7 @@ public class HomeActivity extends AppCompatActivity {
 
         serviceIntent = new Intent(getApplicationContext(), UpdateService.class);
         if (!Global.isUpdateServiceRunning) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(serviceIntent);
-            }else startService(serviceIntent);
+           startService(serviceIntent);
         }
     }
 

@@ -11,18 +11,22 @@ import android.widget.SimpleAdapter;
 import com.callee.calleeclient.client.Message;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ChatSimpleAdapter extends SimpleAdapter {
 
-    private ArrayList<Message> messages;
+    private List<Message> messages;
+    private List<Map<String, String>> data;
 
     private int messageBackMargin, messageFrontMargin, messageVerticalMargin;
 
     public ChatSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to, ArrayList<Message> messages) {
         super(context, data, resource, from, to);
         this.messages = messages;
+
+        this.data = (List<Map<String, String>>)data;
 
         this.messageBackMargin = (int) context.getResources().getDimension(R.dimen.message_back_margin);
         this.messageFrontMargin = (int) context.getResources().getDimension(R.dimen.message_front_margin);
@@ -67,7 +71,8 @@ public class ChatSimpleAdapter extends SimpleAdapter {
     }
 
     private boolean isReceived(int i) {
-        Message m = messages.get(i);
-        return (Global.email.equals(m.getToEmail()));
+        //Message m = messages.get(i);
+        //return (Global.email.equals(m.getToEmail()));
+        return (data.get(i).get("to").compareTo(Global.email)==0);
     }
 }

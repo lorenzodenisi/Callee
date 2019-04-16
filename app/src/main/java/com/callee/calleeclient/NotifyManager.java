@@ -18,10 +18,10 @@ import java.util.HashMap;
 
 public class NotifyManager {
 
-    private final String CHANNEL_ID = "Callee";
+    private final String CHANNEL_ID = "com.callee.calleeclient";
     private final String GROUPKEY = "chats";
     private NotificationManager notificationManager;
-    private int lastId = 0;
+    private int lastId = 1000;
     private HashMap<String, CustomBuilder> builders;
     private HashMap<CustomBuilder, Integer> ids;
     private int SUMMARYID = 0;
@@ -34,20 +34,19 @@ public class NotifyManager {
 
     private void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Callee";
-            String description = "CalleeNotificationManager";
+            CharSequence name = "Callee notifications";
+            String description = "Message notifications";
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
+            channel.setLightColor(Color.RED);
             channel.enableLights(true);
             channel.enableVibration(true);
-            channel.setLightColor(Color.RED);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
             notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            assert notificationManager != null;
             notificationManager.createNotificationChannel(channel);
-
-
         }
         builders = new HashMap<>();
         ids = new HashMap<>();
@@ -68,6 +67,7 @@ public class NotifyManager {
             if (builder == null) {
                 builder = new CustomBuilder(context, this.CHANNEL_ID);
                 builder.setContentText("");
+                builder.setPriority(NotificationCompat.PRIORITY_HIGH);
                 builder.setNumber(upt.size());
                 builder.setContentTitle(m.getFromName());
                 builder.setGroup(this.GROUPKEY);
@@ -107,6 +107,7 @@ public class NotifyManager {
             style.setSummaryText(upt.size()+" new messages");
 
             notificationManager.notify(ids.get(builder), builder.build());
+
             i++;
         }
 
