@@ -1,7 +1,6 @@
 package com.callee.calleeclient.activities;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +12,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,7 +50,7 @@ public class HomeActivity extends AppCompatActivity {
     private PagerAdapter mAdapter;
     private HomeBReceiver broadcastReceiver;
     private Intent serviceIntent;
-    private boolean isRegistered=false;
+    private boolean isRegistered = false;
 
     private LinkedHashMap<String, SingleChat> chats;
     private ArrayList<Contact> contacts;
@@ -67,28 +65,32 @@ public class HomeActivity extends AppCompatActivity {
         }
         db.openConnection(this);
 
-        long dbLastUpdate=db.getLastUpdate();
-        if(dbLastUpdate>=Global.lastUpdate)
-            Global.lastUpdate=dbLastUpdate;
+        long dbLastUpdate = db.getLastUpdate();
+        if (dbLastUpdate >= Global.lastUpdate)
+            Global.lastUpdate = dbLastUpdate;
 
         fetchCredentials();
 
+        //start update service if not running
         serviceIntent = new Intent(getApplicationContext(), UpdateService.class);
         if (!Global.isUpdateServiceRunning) {
-           startService(serviceIntent);
+            startService(serviceIntent);
         }
     }
 
     @Override
     public void onStart() {
 
-        if(Global.notifyManager==null){
-            Global.notifyManager=new NotifyManager(getApplicationContext());
+        //init notifyManager
+        if (Global.notifyManager == null) {
+            Global.notifyManager = new NotifyManager(getApplicationContext());
         }
         Global.notifyManager.setCurrentChat(null);
 
+        //getting chats and messages from db
         fetchInformations();
 
+        //setting up toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -105,12 +107,11 @@ public class HomeActivity extends AppCompatActivity {
         //setting bradcast receiver
         broadcastReceiver = new HomeBReceiver(chats, mAdapter);
         this.registerReceiver(broadcastReceiver, new IntentFilter("com.callee.calleeclient.Broadcast"));
-        isRegistered=true;
+        isRegistered = true;
 
         super.onStart();
         //TODO add custom width to tabs (maybe icons) extension needed
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -133,26 +134,23 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onPause() {
-        if(isRegistered) {
+        if (isRegistered) {
             this.unregisterReceiver(broadcastReceiver);
-            isRegistered=false;
+            isRegistered = false;
         }
         super.onPause();
     }
 
     @Override
-    public void onStop(){
+    public void onStop() {
         super.onStop();
     }
 
     @Override
-    public void onDestroy(){
-
+    public void onDestroy() {
         stopService(serviceIntent);
-
         super.onDestroy();
     }
-
 
     private void fetchInformations() {
 
@@ -179,6 +177,7 @@ public class HomeActivity extends AppCompatActivity {
         Thread t = db.getCredentials(c);
         db.join(t);
 
+        //remember credentials
         if (c.getName() != null && c.getEmail() != null) {
             Global.username = c.getName();
             Global.email = c.getEmail();
@@ -189,14 +188,14 @@ public class HomeActivity extends AppCompatActivity {
         LinkedHashMap<String, SingleChat> chats;
         PagerAdapter mAdapter;
 
-        public HomeBReceiver(){
+        public HomeBReceiver() {
             super();
         }
 
-        public HomeBReceiver(LinkedHashMap<String, SingleChat> chats, PagerAdapter mAdapter){
+        public HomeBReceiver(LinkedHashMap<String, SingleChat> chats, PagerAdapter mAdapter) {
             super();
-            this.mAdapter=mAdapter;
-            this.chats=chats;
+            this.mAdapter = mAdapter;
+            this.chats = chats;
         }
 
         @Override

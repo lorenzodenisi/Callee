@@ -145,7 +145,11 @@ public class WelcomeActivity extends AppCompatActivity {
                 //thread read from 2 and write on 1
                 //main read from 1 and write on 2
                 int res = 0;
+
                 //wait thread to complete register first message
+
+                //waiting for response from server, if the result is 0,
+                // it means that the combination of username and email doesn't match on server
                 try {
                     res = rt.in1.read();     //1=OK 0=ERROR
                 } catch (IOException e) {
@@ -160,6 +164,7 @@ public class WelcomeActivity extends AppCompatActivity {
                         mail.setBackgroundTintList(getResources().getColorStateList(android.R.color.holo_red_dark));
                     }
                 } else {
+                    //if everything ok I switch the fragment to auth fragment, passing the Thread
                     FragmentManager fm = getSupportFragmentManager();
                     authFragment = new AuthFragment();
                     auth = true;
@@ -197,9 +202,11 @@ public class WelcomeActivity extends AppCompatActivity {
                 authButton = welcomeActivity.findViewById(R.id.auth_button);
             }
             if (authButton != null) {
+                //RegisterThread is bounded to the activity so is accessible from both LoginFragment and AuthFragment
                 authButton.setOnClickListener(new ConfirmListener(Objects.requireNonNull(getView()), WelcomeActivity.rt));
             }
         }
+
 
         private class ConfirmListener implements View.OnClickListener {
 
@@ -226,6 +233,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
 
                 if (res == 1) {
+                    //if registration is successful, go to Home Activity
                     Intent intent = new Intent(getActivity(), HomeActivity.class);
                     startActivity(intent);
                 }
@@ -233,6 +241,8 @@ public class WelcomeActivity extends AppCompatActivity {
                     codeField.setText("");
                     codeField.setHint("Wrong code!");
                 }
+                //code 2 means that the code was wrong too many times
+                //so go back to login
                 if (res == 2) {
                     WelcomeActivity parent = (WelcomeActivity) getActivity();
                     if (parent != null && getFragmentManager() != null) {

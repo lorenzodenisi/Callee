@@ -14,7 +14,7 @@ public class Global {
     static public String email;
     static public dbDriver db;
     public static NotifyManager notifyManager;
-    public static Boolean isUpdateServiceRunning=false;
-    public static Long lastUpdate=0L;
+    public static Boolean isUpdateServiceRunning = false;
+    public static Long lastUpdate = 0L;
 
 }

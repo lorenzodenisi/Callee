@@ -56,7 +56,7 @@ public class NotifyManager {
 
         NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
 
-        Intent tapIntent=new Intent(context, HomeActivity.class);
+        Intent tapIntent = new Intent(context, HomeActivity.class);
 
         for (Message m : upt) {
             if (m.getFromEmail().equals(Global.email) || m.getFromEmail().equals(this.currentChat)) {
@@ -92,10 +92,10 @@ public class NotifyManager {
                 .setContentIntent(PendingIntent.getActivity(context, 0, tapIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setDefaults(~Notification.DEFAULT_ALL)
                 .setColor(context.getResources().getColor(R.color.colorAccent))
-                .setVibrate(new long[]{1000,1000,1000,1000})
+                .setVibrate(new long[]{1000, 1000, 1000, 1000})
                 .setAutoCancel(true);
 
-        int i=0;
+        int i = 0;
         for (String email : builders.keySet()) {
             CustomBuilder builder = builders.get(email);
             if (builder.getText().equals(""))
@@ -104,7 +104,7 @@ public class NotifyManager {
                 continue;
 
             style.addLine(email);
-            style.setSummaryText(upt.size()+" new messages");
+            style.setSummaryText(upt.size() + " new messages");
 
             notificationManager.notify(ids.get(builder), builder.build());
 
@@ -113,11 +113,11 @@ public class NotifyManager {
 
         if (i > 1) {
             notificationManager.notify(SUMMARYID, summary.build());
-        }else if(i==1){
-            String email=new ArrayList<>(builders.keySet()).get(0);
+        } else if (i == 1) {
+            String email = new ArrayList<>(builders.keySet()).get(0);
             CustomBuilder cb = builders.get(email);
             cb.setContentIntent(PendingIntent.getActivity(context, 0, tapIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT));
+                    PendingIntent.FLAG_UPDATE_CURRENT));
             cb.setAutoCancel(true);
             cb.setColor(context.getResources().getColor(R.color.colorAccent));
             notificationManager.notify(ids.get(cb), cb.build());

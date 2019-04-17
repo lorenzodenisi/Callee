@@ -34,6 +34,8 @@ public class addContactThread extends Thread {
 
     @Override
     public void run() {
+        //checking if contact is actually a real user
+        //putting contact email inside message to server
         m.putText(email);
 
         try {
@@ -56,6 +58,7 @@ public class addContactThread extends Thread {
         }
     }
 
+    //custom join with return value
     public Contact _join() {
         try {
             this.join();

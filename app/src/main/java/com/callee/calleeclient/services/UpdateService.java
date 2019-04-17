@@ -1,6 +1,5 @@
 package com.callee.calleeclient.services;
 
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -23,7 +22,6 @@ import com.callee.calleeclient.database.dbDriver;
 import com.callee.calleeclient.threads.UpdateThread;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
-import static android.service.notification.Condition.SCHEME;
 import static com.callee.calleeclient.Global.lastUpdate;
 
 public class UpdateService extends Service {

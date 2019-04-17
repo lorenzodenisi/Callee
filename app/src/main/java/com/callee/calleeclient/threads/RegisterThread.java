@@ -43,11 +43,15 @@ public class RegisterThread extends Thread {
     @Override
     public void run() {
         try {
+            //resolving server address
             InetAddress addr = InetAddress.getByName(Global.SERVERHOST);
+            //creating socket
             Socket socket = new Socket(addr.getHostAddress(), Global.PORT);
             Writer outW = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), UTF_8));
+            //sending message
             outW.append(this.message.toJSON()).append("\n").flush();
 
+            //listening for response
             InputStream fromClient = socket.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fromClient, UTF_8));
             String content = bufferedReader.readLine();
@@ -64,8 +68,10 @@ public class RegisterThread extends Thread {
                 return;
             }
 
+            //if I am here, the combination of username and email is right
             out1.write(1);       //OK
 
+            //variable accessible from outside, used to hint thread to finish before blocking functions
             if (stopped) return;
 
             int i;
@@ -73,20 +79,23 @@ public class RegisterThread extends Thread {
 
                 byte[] codeByte = new byte[6];
                 in2.read(codeByte);
-                if (stopped) return;
-                int code;
 
+                //variable accessible from outside, used to hint thread to finish before blocking functions
+                if (stopped) return;
+
+                int code;
                 try {
                     code = Integer.parseInt(new String(codeByte));
                 } catch (NumberFormatException e) {
                     continue;
                 }
 
+                //creating message to send typed 6-digit code
                 message.setType(ToM.REGISTERCONFIRM);
                 message.putText(Integer.toString(code));
 
-                outW.append(this.message.toJSON()).append("\n").flush();     //send message
-                content = bufferedReader.readLine();                        //receive message
+                outW.append(this.message.toJSON()).append("\n").flush();        //send message
+                content = bufferedReader.readLine();                            //receive message
 
                 if (content == null) {
                     out1.write(0);  //ERROR
@@ -105,6 +114,7 @@ public class RegisterThread extends Thread {
                 } else break;
             }
 
+            //finally set credentials inside db
             dbDriver.setCredentialsThread t = Global.db.setCredentials(response.getToName(), response.getToEmail(), null);
             if (t._join()) {
                 out1.write(1);
